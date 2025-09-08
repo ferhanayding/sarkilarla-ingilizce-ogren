@@ -4,16 +4,15 @@
 import Link from "next/link";
 import { LogOutIcon } from "../icons/logout";
 import { LogInIcon } from "../icons/logIn";
+import { useAuth } from "@/app/context/auth/auth-provider";
 
-type Props = {
-  userEmail: string | null;
-  checking: boolean;
-  onSignOut: () => void;
-};
 
-export default function Topbar({ userEmail, checking, onSignOut }: Props) {
+
+export default function Topbar() {
+      const { userEmail, checking, signOut } = useAuth();
+
   return (
-    <header className="sticky top-0 z-40 backdrop-blur bg-white/70">
+    <div className="sticky top-0 z-40 backdrop-blur bg-white/70">
       <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
         {/* Logo */}
         <Link
@@ -36,7 +35,7 @@ export default function Topbar({ userEmail, checking, onSignOut }: Props) {
                 {userEmail}
               </span>
               <button
-                onClick={onSignOut}
+                onClick={signOut}
                 className="inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm bg-white hover:shadow-sm active:scale-[0.98] transition"
               >
                 <LogOutIcon size={16} className="opacity-70" />
@@ -56,6 +55,6 @@ export default function Topbar({ userEmail, checking, onSignOut }: Props) {
       </div>
       {/* Gradient alt çizgi */}
       <div className="h-[1px] w-full bg-gradient-to-r from-indigo-200 via-rose-200 to-amber-200" />
-    </header>
+    </div>
   );
 }

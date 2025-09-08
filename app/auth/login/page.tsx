@@ -1,20 +1,18 @@
 "use client";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { supabase } from "@/lib/supabase/client";
+import { useAuth } from "@/app/context/auth/auth-provider";
 
 export default function LoginPage() {
-  const router = useRouter();
+ const { signInWithPassword } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) return alert(error.message);
-    router.replace("/");
-    router.refresh();
+    const { error } = await signInWithPassword(email, password);
+    if (error) alert(error);
   }
+
 
   return (
     <form onSubmit={onSubmit} className="max-w-sm mx-auto p-6 space-y-3">

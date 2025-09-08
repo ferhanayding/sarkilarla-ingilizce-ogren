@@ -56,7 +56,6 @@ export default function HomeClient({ songs }: { songs: Song[] }) {
         <div className="absolute -bottom-32 -right-24 h-80 w-80 rounded-full blur-3xl opacity-40 bg-amber-200" />
       </div>
 
-      <Topbar userEmail={userEmail} checking={checking} onSignOut={handleSignOut} />
 
       {/* HERO + ARAMA */}
       <section className="mx-auto max-w-6xl px-4 pt-8 pb-4">
