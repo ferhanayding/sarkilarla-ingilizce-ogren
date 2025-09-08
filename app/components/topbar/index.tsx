@@ -5,11 +5,11 @@ import Link from "next/link";
 import { LogOutIcon } from "../icons/logout";
 import { LogInIcon } from "../icons/logIn";
 import { useAuth } from "@/app/context/auth/auth-provider";
-
-
+import LogoMark from "../icons/logo-mark";
+import Logo from "../icons/logo";
 
 export default function Topbar() {
-      const { userEmail, checking, signOut } = useAuth();
+  const { userEmail, checking, signOut } = useAuth();
 
   return (
     <div className="sticky top-0 z-40 backdrop-blur bg-white/70">
@@ -17,12 +17,9 @@ export default function Topbar() {
         {/* Logo */}
         <Link
           href="/"
-          className="inline-flex items-center gap-2 rounded-2xl px-3 py-2 border shadow-sm bg-white hover:shadow transition"
+          // className="inline-flex items-center gap-2 rounded-2xl  border shadow-sm bg-white hover:shadow transition"
         >
-          <div className="h-7 w-7 rounded-xl flex items-center justify-center text-xs font-bold text-white bg-gradient-to-br from-indigo-600 to-rose-500 shadow-sm">
-            L
-          </div>
-          <span className="font-extrabold tracking-tight">LOGO</span>
+          <Logo  />
         </Link>
 
         {/* Sağ taraf: auth */}
