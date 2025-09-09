@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --brand: 15 28 46;         /* #0F1C2E */
-  --brand2: 49 60 75;       /* #313C4B */
-  --brand3:238 242 246;     /* #444E5C */
+  --brand: 15 28 46; /* #0F1C2E */
+  --brand2: 49 60 75; /* #313C4B */
+  --brand3: 24 35 50; /* rgb(24,35,50) #182332 */
+  --brand4: 238 242 246; /* #444E5C */
   --brand-foreground: 255 255 255; /* #FFFFFF */
-  --accent: 37 99 235;       /* #2563EB */
-
+  --accent: 37 99 235; /* #2563EB */
 }
 
 @theme inline {
@@ -31,17 +31,49 @@ body {
 
 /* ✅ Brand yardımcıları (Tailwind katmanı) */
 @layer utilities {
-  .text-brand { color: rgb(var(--brand)); }
-  .bg-brand { background-color: rgb(var(--brand)); }
-  .bg-brand2{ background-color: rgb(var(--brand2)); }
-  .bg-brand3{ background-color: rgb(var(--brand3)); }
-  .bg-brand-tint-4 { background-color: rgb(var(--brand) / 0.04); }
-  .bg-brand-tint-6 { background-color: rgb(var(--brand) / 0.06); }
-  .border-brand-14 { border-color: rgb(var(--brand) / 0.14); }
-  .border-brand-18 { border-color: rgb(var(--brand) / 0.18); }
-  .ring-accent-25 { --tw-ring-color: rgb(var(--accent) / 0.25); }
-  .ring-accent-35 { --tw-ring-color: rgb(var(--accent) / 0.35); }
-  .bg-accent { background-color: rgb(var(--accent)); }
-  .bg-accent-10 { background-color: rgb(var(--accent) / 0.10); }
-  .text-accent { color: rgb(var(--accent)); }
+  .asd {
+    color: rgb(202, 206, 210);
+  }
+  .text-brand {
+    color: rgb(var(--brand));
+  }
+  .bg-brand {
+    background-color: rgb(var(--brand));
+  }
+  .bg-brand2 {
+    background-color: rgb(var(--brand2));
+  }
+  .bg-brand3 {
+    background-color: rgb(var(--brand3));
+  }
+  .bg-brand4 {
+    background-color: rgb(var(--brand4));
+  }
+  .bg-brand-tint-4 {
+    background-color: rgb(var(--brand) / 0.04);
+  }
+  .bg-brand-tint-6 {
+    background-color: rgb(var(--brand) / 0.06);
+  }
+  .border-brand-14 {
+    border-color: rgb(var(--brand) / 0.14);
+  }
+  .border-brand-18 {
+    border-color: rgb(var(--brand) / 0.18);
+  }
+  .ring-accent-25 {
+    --tw-ring-color: rgb(var(--accent) / 0.25);
+  }
+  .ring-accent-35 {
+    --tw-ring-color: rgb(var(--accent) / 0.35);
+  }
+  .bg-accent {
+    background-color: rgb(var(--accent));
+  }
+  .bg-accent-10 {
+    background-color: rgb(var(--accent) / 0.1);
+  }
+  .text-accent {
+    color: rgb(var(--accent));
+  }
 }
