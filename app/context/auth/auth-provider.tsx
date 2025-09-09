@@ -19,14 +19,11 @@ export default function AuthProvider({
   initialUserEmail = null,
 }: {
   children: React.ReactNode;
-  /** SSR'dan gelen ilk kullanıcı (flicker azaltır) */
   initialUserEmail?: string | null;
 }) {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string | null>(initialUserEmail);
   const [checking, setChecking] = useState<boolean>(true);
-
-  // İlk yüklemede kullanıcıyı oku + auth state dinle
   useEffect(() => {
     let alive = true;
 
@@ -43,7 +40,6 @@ export default function AuthProvider({
 
     const { data: sub } = supabase.auth.onAuthStateChange((_ev, session) => {
       setUserEmail(session?.user?.email ?? null);
-      // server component'ları güncelle (cookie/middleware senkronu)
       router.refresh();
     });
 
@@ -51,7 +47,7 @@ export default function AuthProvider({
       alive = false;
       sub.subscription.unsubscribe();
     };
-  }, [router]);
+  }, [router,initialUserEmail]);
 
   const signInWithPassword: AuthCtx["signInWithPassword"] = async (email, password) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });

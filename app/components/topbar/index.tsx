@@ -19,10 +19,14 @@ export default function Topbar() {
   const pathname = usePathname();
   const isAuth = pathname.startsWith("/auth");
   const { userEmail, checking, signOut } = useAuth();
-
+  
   const [scrolled, setScrolled] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  useEffect(() => {
 
+
+  }, [isAuth]);  
+      
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
@@ -43,7 +47,6 @@ export default function Topbar() {
         <div className="mx-auto max-w-[1170px] h-[65px] px-4 flex items-center justify-between">
           {isAuth ? (
             <>
-              {/* <div className="w-[140px] shrink-0" /> */}
               <div className="flex-1 flex justify-start">
                 <Link
                   href="/"

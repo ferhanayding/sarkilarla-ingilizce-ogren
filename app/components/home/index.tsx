@@ -18,7 +18,6 @@ export default function HomeClient({ songs }: { songs: Song[] }) {
   const [_checking, setChecking] = useState(true);
   const [view, setView] = useState<ViewMode>("grid"); // 👈 toggle state
   const twoCols = useIsSmUp();
-  console.log("twoCols", twoCols);
   useEffect(() => {
     let mounted = true;
     supabase.auth.getUser().then(({ data }) => {

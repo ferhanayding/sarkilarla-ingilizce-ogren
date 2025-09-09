@@ -9,7 +9,6 @@ export type AvatarTooltipProps = {
 export function AvatarTooltip({ email }: AvatarTooltipProps) {
   const letter = (email || "U").charAt(0).toUpperCase();
   const tooltipId = useId();
-  console.log(email);
 
   return (
     <div className="relative group">

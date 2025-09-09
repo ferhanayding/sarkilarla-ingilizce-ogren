@@ -30,12 +30,15 @@ export default async function RootLayout({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  console.log("user in layout", user?.email)
   return (
     <html lang="en">
         <body  style={themeStyle}  
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-      <AuthProvider initialUserEmail={user?.email ?? null}>
+      <AuthProvider 
+        initialUserEmail={user?.email}
+      >
         <Topbar />
           {children}
       </AuthProvider>
