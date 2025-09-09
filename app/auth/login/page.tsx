@@ -38,7 +38,6 @@ export default function LoginPage() {
   const [serverError, setServerError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // login form
   const {
     register: regLogin,
     handleSubmit: handleLoginSubmit,
@@ -48,7 +47,6 @@ export default function LoginPage() {
     defaultValues: { email: "", password: "" },
   });
 
-  // register form
   const {
     register: regRegister,
     handleSubmit: handleRegisterSubmit,
@@ -63,7 +61,7 @@ async function onLogin(values: z.infer<typeof loginSchema>) {
   setServerError(null);
   startTransition(async () => {
     const res = await signInWithPasswordAction(values);
-    if (res?.error) setServerError(res.error); // redirect olmazsa (hata)
+    if (res?.error) setServerError(res.error);
   });
 }
   async function onRegister(values: z.infer<typeof registerSchema>) {
@@ -72,14 +70,12 @@ async function onLogin(values: z.infer<typeof loginSchema>) {
     const { data, error } = await supabase.auth.signUp({
       email: values.email,
       password: values.password,
-      // options: { emailRedirectTo: `${location.origin}/auth/callback` },
     });
     setLoading(false);
     if (error) {
       setServerError(error.message);
       return;
     }
-    // E-posta doğrulaması açıksa session gelmez:
     if (!data.user || !data.session) {
       alert(
         "Kayıt oluşturuldu. Lütfen e-postana gelen doğrulama bağlantısını kontrol et."
@@ -95,7 +91,6 @@ async function onLogin(values: z.infer<typeof loginSchema>) {
 
   return (
 <main className="relative min-h-[calc(100dvh-62px)] text-white">
-      {/* Arka plan + overlay */}
       <div
         className="absolute inset-0 -z-10 bg-cover bg-center"
         style={{ backgroundImage: `url(${BG_URL})` }}
@@ -103,10 +98,8 @@ async function onLogin(values: z.infer<typeof loginSchema>) {
       <div className="absolute inset-0 -z-10 bg-black/60 backdrop-blur-sm" />
       <div className="pointer-events-none absolute -z-10 inset-x-0 -top-24 mx-auto h-64 w-[900px] rounded-full blur-3xl opacity-60 bg-[radial-gradient(600px_200px_at_center,theme(colors.indigo.500/.35),transparent)]" />
 
-      {/* İçerik */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-12">
-          {/* Sol bilgilendirme kartı (lg+) */}
           <section className="hidden lg:block lg:col-span-6">
             <div className="rounded-3xl border border-white/15 bg-white/5 backdrop-blur-sm p-8 h-full flex flex-col justify-between shadow-[0_10px_60px_rgba(0,0,0,.5)]">
               <div>
@@ -139,10 +132,8 @@ async function onLogin(values: z.infer<typeof loginSchema>) {
             </div>
           </section>
 
-          {/* Sağ: Auth kartı */}
           <section className="lg:col-span-6">
             <div className="mx-auto max-w-md rounded-3xl border border-white/15 bg-white/10 backdrop-blur-md shadow-[0_10px_60px_rgba(0,0,0,.6)] p-6 sm:p-8">
-              {/* Tabs */}
               <div className="grid grid-cols-2 rounded-xl p-1 bg-white/5 border border-white/10">
                 <button
                   onClick={() => setTab("login")}
@@ -179,7 +170,6 @@ async function onLogin(values: z.infer<typeof loginSchema>) {
                   <Field label="E-posta" error={loginErrors.email?.message}>
                     <input
                       type="email"
-                      // autoComplete="email"
                       placeholder="ornek@posta.com"
                       className="form-input"
                       {...regLogin("email")}
@@ -277,7 +267,6 @@ async function onLogin(values: z.infer<typeof loginSchema>) {
         </div>
       </div>
 
-      {/* Form stilleri */}
       <style jsx>{`
         .form-input {
           width: 100%;
@@ -314,7 +303,6 @@ async function onLogin(values: z.infer<typeof loginSchema>) {
   );
 }
 
-// Küçük UI yardımcıları
 function Field({
   label,
   error,
@@ -354,7 +342,6 @@ const PasswordInput = React.forwardRef<
         aria-label={show ? "Şifreyi gizle" : "Şifreyi göster"}
       >
         {show ? (
-          // eye-off
           <svg
             width="18"
             height="18"
@@ -371,7 +358,7 @@ const PasswordInput = React.forwardRef<
             />
           </svg>
         ) : (
-          // eye
+          
           <svg
             width="18"
             height="18"
