@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { tagStyleFor } from "@/lib/ui/tag-styles";
 import { Song } from "@/types/songs";
 import { ArrowRightIcon } from "../icons/arrow-right";
+import { chipTone } from "@/ui/theme/utils";
 
 export default function SongCard({ song }: { song: Song }) {
   return (
@@ -11,13 +11,11 @@ export default function SongCard({ song }: { song: Song }) {
       href={`/song/${song.slug}`}
       className={[
         "group relative rounded-2xl transition cursor-pointer",
-        // ✅ Topbar ile aynı: solid brand + beyaz hat
         "bg-brand2 border border-white/10",
         "shadow-sm hover:shadow-md hover:-translate-y-0.5",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-35",
       ].join(" ")}
     >
-      {/* üstte ince çizgi (istersen accent yerine beyaz kullan) */}
       <div className="absolute inset-x-0 -top-px h-px bg-white/10" />
 
       <div className="p-4 text-white">
@@ -37,9 +35,9 @@ export default function SongCard({ song }: { song: Song }) {
             {song.tags.slice(0, 4).map((t) => (
               <span
                 key={t}
-                className={`text-xs rounded-full px-2 py-1 border transition ${tagStyleFor(
+                className={`text-xs rounded-full px-2 py-1 border transition ${chipTone(
                   t
-                )} bg-white/10 border-white/20 text-white/90`}
+                )}`}
               >
                 #{t}
               </span>

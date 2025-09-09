@@ -32,7 +32,7 @@ export default function Topbar() {
 
   const wrap =
     "sticky top-0 z-50 h-[65px] text-white relative " +
-    "bg-[rgb(var(--brand))] " +
+    "bg-[rgb(var(--brand2))] " +
     "border-b border-white/10 " +
     "after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-white/10 " +
     (scrolled ? "shadow-[0_4px_12px_rgba(0,0,0,.15)]" : "");

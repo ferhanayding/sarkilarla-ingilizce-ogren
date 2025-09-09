@@ -12,7 +12,7 @@ export default function EmptyState({ query }: { query: string }) {
         className="mx-auto mb-3 h-10 w-10 rounded-xl border flex items-center justify-center
                   border-brand-18 bg-accent-10"
       >
-        <SearchIcon size={16} className="h-6 w-6 text-accent opacity-80" />
+        <SearchIcon size={16} className="h-6 w-6  opacity-80" />
       </div>
       <h3 className="text-lg font-semibold">Sonuç yok</h3>
       <p className="mt-1 text-sm opacity-70">

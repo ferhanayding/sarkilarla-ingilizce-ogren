@@ -1,18 +1,21 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { Song } from "@/types/songs";
+
 import SearchBar from "../searchbar";
 import EmptyState from "../empty-state";
 import SongCard from "../song-card";
+import SongListRows from "../song-table";
+
+type ViewMode = "grid" | "list";
 
 export default function HomeClient({ songs }: { songs: Song[] }) {
-  const router = useRouter();
   const [q, setQ] = useState("");
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [checking, setChecking] = useState(true);
+  const [_userEmail, setUserEmail] = useState<string | null>(null);
+  const [_checking, setChecking] = useState(true);
+  const [view, setView] = useState<ViewMode>("grid"); // 👈 toggle state
 
   useEffect(() => {
     let mounted = true;
@@ -37,63 +40,85 @@ export default function HomeClient({ songs }: { songs: Song[] }) {
     });
   }, [q, songs]);
 
-  async function handleSignOut() {
-    await supabase.auth.signOut();
-    setUserEmail(null);
-    router.refresh();
-  }
-
   return (
-    <div className="min-h-screen relative  overflow-hidden bg-brand3">
-      {/* Brand-temalı arka plan katmanları */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        {/* temel yumuşak degrade (çok açık) */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white via-white to-white" />
-        {/* brand tint glow (üst) */}
-        <div
-          className="absolute -top-24 left-1/2 -translate-x-1/2 h-[22rem] w-[1000px] rounded-full blur-3xl opacity-70
-                        bg-[radial-gradient(700px_240px_at_center,rgb(var(--brand,15_28_46))/0.10,transparent)]"
-        />
-
-        <div
-          className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full blur-3xl opacity-60
-                        bg-[radial-gradient(45%_45%_at_center,rgb(var(--accent,37_99_235))/0.18,transparent)]"
-        />
-        {/* ikinci tint (sağ-alt) */}
-        <div
-          className="absolute -bottom-32 -right-24 h-80 w-80 rounded-full blur-3xl opacity-50
-                        bg-[radial-gradient(50%_50%_at_center,rgb(var(--brand,15_28_46))/0.12,transparent)]"
-        />
-      </div>
-
-      {/* HERO + ARAMA */}
+    <div className="min-h-screen relative overflow-hidden bg-brand3">
       <section className="mx-auto max-w-6xl px-4 pt-8 pb-4">
-        <div className="space-y-4">
-          <div>
+        {/* başlık + toggle üst sağ */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="space-y-2">
             <h1 className="text-3xl font-extrabold tracking-tight text-[rgb(var(--brand,15_28_46))]">
-              Phonetic Karaoke 🎤
+              şarkılarlaİngilizceÖğreniyorum.COM
             </h1>
-            <p className="opacity-70">
-              İngilizce şarkılar • Türkçe okunuş • Türkçe anlam
-            </p>
+            <p className="opacity-70">İngilizce şarkılar • Türkçe okunuş • Türkçe anlam</p>
           </div>
 
+          <div className="flex items-center gap-2 self-end">
+            <button
+              type="button"
+              onClick={() => setView("grid")}
+              aria-pressed={view === "grid"}
+              title="Kart görünümü"
+              className={[
+                "inline-flex items-center gap-2 h-9 rounded-xl px-3 text-sm transition cursor-pointer border",
+                view === "grid"
+                  ? "text-white bg-[rgb(var(--brand2,49_60_75))] border-white/20"
+                  : "text-[rgb(var(--brand,15_28_46))] bg-white/70 hover:bg-white/90 border-[rgb(var(--brand2,49_60_75))/0.18]",
+              ].join(" ")}
+            >
+              <GridIcon /> Kart
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setView("list")}
+              aria-pressed={view === "list"}
+              title="Liste görünümü"
+              className={[
+                "inline-flex items-center gap-2 h-9 rounded-xl px-3 text-sm transition cursor-pointer border",
+                view === "list"
+                  ? "text-white bg-[rgb(var(--brand2,49_60_75))] border-white/20"
+                  : "text-[rgb(var(--brand,15_28_46))] bg-white/70 hover:bg-white/90 border-[rgb(var(--brand2,49_60_75))/0.18]",
+              ].join(" ")}
+            >
+              <ListIcon /> Liste
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-4">
           <SearchBar value={q} onChange={setQ} count={filtered.length} />
         </div>
       </section>
 
-      {/* KART GRID */}
       <main className="mx-auto max-w-6xl px-4 pb-12">
         {filtered.length === 0 ? (
           <EmptyState query={q} />
-        ) : (
+        ) : view === "grid" ? (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((s) => (
               <SongCard key={s.slug} song={s} />
             ))}
           </div>
+        ) : (
+          <SongListRows songs={filtered} />
         )}
       </main>
     </div>
+  );
+}
+
+/* ikonlar */
+function GridIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" {...props}>
+      <path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z" fill="currentColor" />
+    </svg>
+  );
+}
+function ListIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" {...props}>
+      <path d="M4 6h16v3H4zm0 5h16v3H4zm0 5h16v3H4z" fill="currentColor" />
+    </svg>
   );
 }
