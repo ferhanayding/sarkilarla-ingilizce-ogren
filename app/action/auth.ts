@@ -1,4 +1,3 @@
-// app/actions/auth.ts
 "use server";
 
 import { redirect } from "next/navigation";
@@ -8,7 +7,7 @@ export async function signInWithPasswordAction(values: { email: string; password
   const supabase = await supabaseServerAction();
   const { error } = await supabase.auth.signInWithPassword(values);
   if (error) return { error: error.message };
-  redirect("/"); // en hızlı geçiş
+  redirect("/"); 
 }
 
 export async function signOutAction() {

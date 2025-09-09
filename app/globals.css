@@ -3,6 +3,11 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+   /* Ana renk: #0F1C2E  → rgb(15 28 46) */
+  --brand: 15 28 46;
+  --brand-foreground: 255 255 255; /* metin için */
+  /* İstersen CTA için ayrı bir vurgulu mavi (opsiyonel) */
+  --accent: 37 99 235; /* #2563EB */
 }
 
 @theme inline {

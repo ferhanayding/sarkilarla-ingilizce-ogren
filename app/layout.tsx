@@ -4,6 +4,7 @@ import "./globals.css";
 import Topbar from "./components/topbar";
 import AuthProvider from "./context/auth/auth-provider";
 import { supabaseServerComponent } from "@/lib/supabase/server";
+import { themeStyle } from "@/ui/theme/config";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +33,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
         <body
+        style={themeStyle}
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
       <AuthProvider initialUserEmail={user?.email ?? null}>
