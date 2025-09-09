@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="512" cy="512" r="420" fill="#ffffff"/>
+  <circle cx="512" cy="512" r="425.0" fill="none" stroke="#ffffff" stroke-width="10"/>
+  <circle cx="512" cy="512" r="435.0" fill="none" stroke="#000000" stroke-width="6"/>
+  <circle cx="512" cy="512" r="447.0" fill="none" stroke="#ffffff" stroke-width="14"/>
+  <circle cx="512" cy="512" r="459.0" fill="none" stroke="#000000" stroke-width="6"/>
+
+  <g transform="translate(355.0,512) rotate(-16)">
+    <rect x="-24.5" y="-226.5" width="49" height="453" rx="24.5" fill="#000000"/>
+  </g>
+  <g transform="translate(669.0,512) rotate(-16)">
+    <rect x="-24.5" y="-226.5" width="49" height="453" rx="24.5" fill="#000000"/>
+  </g>
+
+  <rect x="429.0" y="407" width="166" height="124" rx="53" fill="#000000"/>
+<rect x="458" y="427" width="106" height="6" rx="3" fill="#000000" opacity="0.65"/>
+<rect x="458" y="452" width="106" height="6" rx="3" fill="#000000" opacity="0.65"/>
+<rect x="458" y="477" width="106" height="6" rx="3" fill="#000000" opacity="0.65"/>
+<rect x="458" y="502" width="106" height="6" rx="3" fill="#000000" opacity="0.65"/>
+
+  <rect x="490.5" y="543" width="43" height="69" rx="21.5" fill="#000000"/>
+  <rect x="450.0" y="625" width="124" height="19" rx="9.5" fill="#000000"/>
+</svg>

@@ -6,20 +6,21 @@ import { LogOutIcon } from "../icons/logout";
 import { LogInIcon } from "../icons/logIn";
 import { useAuth } from "@/app/context/auth/auth-provider";
 import LogoMark from "../icons/logo-mark";
-import Logo from "../icons/logo";
+import { LogoDark } from "../icons/logom-dark";
+
 
 export default function Topbar() {
   const { userEmail, checking, signOut } = useAuth();
 
   return (
-    <div className="sticky top-0 z-40 backdrop-blur bg-white/70">
+    <div className="sticky top-0 z-40 max-h-16 backdrop-blur bg-white/75">
       <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
-        {/* Logo */}
+      
         <Link
           href="/"
           // className="inline-flex items-center gap-2 rounded-2xl  border shadow-sm bg-white hover:shadow transition"
         >
-          <Logo  />
+          <LogoDark  />
         </Link>
 
         {/* Sağ taraf: auth */}
@@ -51,7 +52,7 @@ export default function Topbar() {
         </div>
       </div>
       {/* Gradient alt çizgi */}
-      <div className="h-[1px] w-full bg-gradient-to-r from-indigo-200 via-rose-200 to-amber-200" />
+      {/* <div className="h-[1px] w-full bg-gradient-to-r from-indigo-200 via-rose-200 to-amber-200" /> */}
     </div>
   );
 }
