@@ -1,13 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-   /* Ana renk: #0F1C2E  → rgb(15 28 46) */
-  --brand: 15 28 46;
-  --brand-foreground: 255 255 255; /* metin için */
-  /* İstersen CTA için ayrı bir vurgulu mavi (opsiyonel) */
-  --accent: 37 99 235; /* #2563EB */
+  --brand: 15 28 46;         /* #0F1C2E */
+  --brand2: 49 60 75;       /* #313C4B */
+  --brand3:238 242 246;     /* #444E5C */
+  --brand-foreground: 255 255 255; /* #FFFFFF */
+  --accent: 37 99 235;       /* #2563EB */
+
 }
 
 @theme inline {
@@ -28,4 +27,21 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ✅ Brand yardımcıları (Tailwind katmanı) */
+@layer utilities {
+  .text-brand { color: rgb(var(--brand)); }
+  .bg-brand { background-color: rgb(var(--brand)); }
+  .bg-brand2{ background-color: rgb(var(--brand2)); }
+  .bg-brand3{ background-color: rgb(var(--brand3)); }
+  .bg-brand-tint-4 { background-color: rgb(var(--brand) / 0.04); }
+  .bg-brand-tint-6 { background-color: rgb(var(--brand) / 0.06); }
+  .border-brand-14 { border-color: rgb(var(--brand) / 0.14); }
+  .border-brand-18 { border-color: rgb(var(--brand) / 0.18); }
+  .ring-accent-25 { --tw-ring-color: rgb(var(--accent) / 0.25); }
+  .ring-accent-35 { --tw-ring-color: rgb(var(--accent) / 0.35); }
+  .bg-accent { background-color: rgb(var(--accent)); }
+  .bg-accent-10 { background-color: rgb(var(--accent) / 0.10); }
+  .text-accent { color: rgb(var(--accent)); }
 }

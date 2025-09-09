@@ -32,8 +32,7 @@ export default async function RootLayout({
   } = await supabase.auth.getUser();
   return (
     <html lang="en">
-        <body
-        style={themeStyle}
+        <body  style={themeStyle}  
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
       <AuthProvider initialUserEmail={user?.email ?? null}>

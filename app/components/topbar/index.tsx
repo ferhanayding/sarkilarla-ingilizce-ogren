@@ -70,15 +70,12 @@ export default function Topbar() {
 
                 <NavLink
                   href="/favorites"
-                  
                   active={pathname.startsWith("/favorites")}
                   title="Favorilerim"
                 >
                   <HeartIcon />
                   <span className="hidden sm:inline">Favorilerim</span>
                 </NavLink>
-
-              
               </div>
             </>
           ) : (
