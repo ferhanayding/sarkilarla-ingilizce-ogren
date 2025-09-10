@@ -1056,4 +1056,104 @@ export const SONGS: Song[] = [
     ],
     tags: ["pop", "90s", "sting"],
   },
+  {
+  slug: "what-a-wonderful-world",
+  title: "What a Wonderful World",
+  artist: "Louis Armstrong",
+  youtubeId: "CWzrABouyeE",
+  lines: [
+    {
+      t: "0.00",
+      en: "I see trees of green, red roses too",
+      ph: "ay sii triiz of griin, red rouziz tuu",
+      tr: "Yeşil ağaçlar görüyorum, kırmızı güller de",
+    },
+    {
+      t: "0.14",
+      en: "I see them bloom for me and you",
+      ph: "ay sii dem bluum for mi end yu",
+      tr: "Benim ve senin için açtıklarını görüyorum",
+    },
+    {
+      t: "0.20",
+      en: "And I think to myself, what a wonderful world",
+      ph: "end ay tink tu mayself, vat a vandırfıl vörld",
+      tr: "Ve kendi kendime diyorum ki, ne harika bir dünya",
+    },
+    {
+      t: "0.33",
+      en: "I see skies of blue and clouds of white",
+      ph: "ay sii skayz of bluu end klauudz of vayt",
+      tr: "Mavi gökyüzü ve beyaz bulutlar görüyorum",
+    },
+    {
+      t: "0.41",
+      en: "The bright blessed day, the dark sacred night",
+      ph: "dı brayt blesd dey, dı dark seykırd nayt",
+      tr: "Parlak kutsanmış gün, karanlık kutsal gece",
+    },
+    {
+      t: "0.47",
+      en: "And I think to myself, what a wonderful world",
+      ph: "end ay tink tu mayself, vat a vandırfıl vörld",
+      tr: "Ve kendi kendime diyorum ki, ne harika bir dünya",
+    },
+    {
+      t: "1.01",
+      en: "The colors of the rainbow, so pretty in the sky",
+      ph: "dı kalırz of dı reynbou, so priti in dı skay",
+      tr: "Gökkuşağının renkleri, gökyüzünde çok güzel",
+    },
+    {
+      t: "1.07",
+      en: "Are also on the faces of people going by",
+      ph: "ar olsou on dı feysiz of piipıl gouing bay",
+      tr: "Yoldan geçen insanların yüzlerinde de var",
+    },
+    {
+      t: "1.13",
+      en: "I see friends shaking hands, saying 'How do you do?'",
+      ph: "ay sii frendz şeyking hends, seying hav du yu du",
+      tr: "Arkadaşların el sıkıştığını, 'Nasılsın?' dediklerini görüyorum",
+    },
+    {
+      t: "1.21",
+      en: "They're really saying, 'I love you'",
+      ph: "deyr rili seying, ay lav yu",
+      tr: "Aslında 'Seni seviyorum' diyorlar",
+    },
+    {
+      t: "1.27",
+      en: "I hear babies cry, I watch them grow",
+      ph: "ay hiir beybiiz kray, ay voç dem grou",
+      tr: "Bebeklerin ağladığını duyuyorum, büyüdüklerini izliyorum",
+    },
+    {
+      t: "1.34",
+      en: "They'll learn much more than I'll ever know",
+      ph: "deyl lörn maç mor den ayl evır nou",
+      tr: "Benden çok daha fazlasını öğrenecekler",
+    },
+    {
+      t: "1.40",
+      en: "And I think to myself, what a wonderful world",
+      ph: "end ay tink tu mayself, vat a vandırfıl vörld",
+      tr: "Ve kendi kendime diyorum ki, ne harika bir dünya",
+    },
+    {
+      t: "1.52",
+      en: "Yes, I think to myself, what a wonderful world",
+      ph: "yes, ay tink tu mayself, vat a vandırfıl vörld",
+      tr: "Evet, kendi kendime diyorum ki, ne harika bir dünya",
+    },
+    {
+      t: "2.10",
+      en: "Ooh, yes",
+      ph: "uh, yes",
+      tr: "Ah, evet",
+    },
+  ],
+  tags: ["jazz", "classic"]
+}
+
 ];

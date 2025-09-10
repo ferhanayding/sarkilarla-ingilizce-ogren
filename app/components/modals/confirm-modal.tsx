@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import React, { useRef, useState } from "react";
+import { Modal } from "../ui/modal";
 
 export type ConfirmDialogProps = {
   open: boolean;
@@ -10,6 +11,10 @@ export type ConfirmDialogProps = {
   cancelText?: string;
   onConfirm: () => void | Promise<void>;
   onCancel: () => void;
+  closeOnEsc?: boolean;
+  closeOnBackdrop?: boolean;
+  danger?: boolean;
+  size?: "sm" | "md" | "lg" | "xl" | "full";
 };
 
 export function ConfirmDialog({
@@ -20,72 +25,94 @@ export function ConfirmDialog({
   cancelText = "Vazgeç",
   onConfirm,
   onCancel,
+  closeOnEsc = true,
+  closeOnBackdrop = true,
+  danger = false,
+  size = "sm",
 }: ConfirmDialogProps) {
   const cancelRef = useRef<HTMLButtonElement>(null);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onCancel();
-    };
-    window.addEventListener("keydown", onKey);
-    // autofocus cancel
-    const id = setTimeout(() => cancelRef.current?.focus(), 0);
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      clearTimeout(id);
-    };
-  }, [open, onCancel]);
+  const handleConfirm = async () => {
+    try {
+      setLoading(true);
+      await onConfirm();
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  if (!open) return null;
+  const confirmBtnClass = danger
+    ? "bg-[rgb(var(--error,220_38_38))] hover:bg-[rgb(var(--error,220_38_38))]/90"
+    : "bg-[rgb(var(--accent,37_99_235))] hover:bg-[rgb(var(--accent,37_99_235))]/90";
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="confirm-title"
-      className="fixed inset-0 z-[100] flex items-center justify-center"
-      onMouseDown={(e) => {
-        // backdrop click kapatsın
-        if (e.target === e.currentTarget) onCancel();
-      }}
-    >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-
-      {/* Modal content */}
-      <div className="relative mx-4 w-full max-w-sm rounded-2xl border border-white/10
-                      bg-[rgb(var(--brand))] text-white shadow-2xl p-4">
-        <h2 id="confirm-title" className="text-base font-semibold">
-          {title}
-        </h2>
-        {description ? (
-          <p className="mt-1 text-sm text-white/80">{description}</p>
-        ) : null}
-
-        <div className="mt-4 flex items-center justify-end gap-2">
+    <Modal
+      open={open}
+      onClose={onCancel}
+      title={title}
+      description={description}
+      closeOnEsc={closeOnEsc}
+      closeOnBackdrop={closeOnBackdrop}
+      size={size}
+      className="bg-[rgb(var(--brand2,38_44_56))]"
+      footer={
+        <div className="flex items-center justify-end gap-2">
           <button
             ref={cancelRef}
             type="button"
             onClick={onCancel}
-            className="inline-flex items-center justify-center h-9 px-3 rounded-xl
+            disabled={loading}
+            className="inline-flex h-9 px-3 items-center justify-center rounded-xl
                        border border-white/20 bg-white/10 hover:bg-white/20
-                       text-white text-sm transition cursor-pointer"
+                       text-white text-sm transition disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {cancelText}
           </button>
-
           <button
             type="button"
-            onClick={onConfirm}
-            className="inline-flex items-center justify-center h-9 px-3 rounded-xl
-                       text-white text-sm transition cursor-pointer
-                       bg-[rgb(var(--accent))] hover:bg-[rgb(var(--accent))/0.92]"
+            onClick={handleConfirm}
+            disabled={loading}
+            className={`inline-flex h-9 px-3 items-center justify-center rounded-xl text-white text-sm transition
+                       ${confirmBtnClass} disabled:opacity-60 disabled:cursor-not-allowed`}
           >
-            {confirmText}
+            {loading ? (
+              <span className="inline-flex items-center gap-2">
+                <Spinner className="h-4 w-4" />
+                {confirmText}
+              </span>
+            ) : (
+              confirmText
+            )}
           </button>
         </div>
-      </div>
-    </div>
+      }
+    />
+  );
+}
+
+function Spinner({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg
+      className={`animate-spin ${className}`}
+      viewBox="0 0 24 24"
+      role="status"
+      aria-label="Yükleniyor"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+        fill="none"
+      />
+      <path
+        className="opacity-90"
+        fill="currentColor"
+        d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"
+      />
+    </svg>
   );
 }

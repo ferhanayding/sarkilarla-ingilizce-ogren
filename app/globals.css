@@ -7,6 +7,9 @@
   --brand4: 238 242 246; /* #444E5C */
   --brand-foreground: 255 255 255; /* #FFFFFF */
   --accent: 37 99 235; /* #2563EB */
+  --error: 220 38 38; /* #DC2626 */
+  --warning: 202 138 4; /* #CA8A04 */
+  --success: 5 150 105; /* #059669 */
 }
 
 @theme inline {
@@ -93,5 +96,14 @@ body {
   }
   .text-accent {
     color: rgb(var(--accent));
+  }
+  .text-error {
+    color: rgb(var(--error));
+  }
+  .text-warning {
+    color: rgb(var(--warning));
+  }
+  .text-success {
+    color: rgb(var(--success));
   }
 }

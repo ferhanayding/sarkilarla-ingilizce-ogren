@@ -10,7 +10,7 @@ import SongCard from "../song-card";
 import SongListRows from "../song-table";
 import { useIsSmUp } from "@/app/hooks/useIsSmUp";
 import { useSongs } from "@/app/action/songs";
-import { CardGridSkeleton } from "../ui/loading";
+import { CardGridSkeleton, FullScreenLoader } from "../ui/loading";
 import { ListSkeleton } from "../icons/list-skeleton";
 import { GridIcon } from "../icons/grid-icon";
 import { ListIcon } from "../icons/list-icon";
@@ -53,7 +53,7 @@ export default function HomeClient() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="sm:flex sm:items-center sm:justify-between text-center sm:text-left self-center sm:self-auto w-full">
             <p className="opacity-70 text-sm sm:text-base text-white/100">
-              • İngilizce şarkılar • Türkçe okunuş • Türkçe anlam
+              • İngilizce şarkılar • Türkçe okunuş • Türkçe anlam 
             </p>
 
             {twoCols && (
