@@ -8,6 +8,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { supabase } from "@/lib/supabase/client";
 import { signInWithPasswordAction } from "@/app/action/auth";
+import { toast } from "sonner"; // 👈 ekle
 
 // Arka plan görseli (blur arkasında kalır)
 const BG_URL =
@@ -55,42 +56,57 @@ export default function LoginPage() {
     resolver: zodResolver(registerSchema),
     defaultValues: { email: "", password: "", confirm: "" },
   });
-const [pending, startTransition] = React.useTransition();
+  const [pending, startTransition] = React.useTransition();
+const [infoMessage, setInfoMessage] = useState<string | null>(null);
 
-async function onLogin(values: z.infer<typeof loginSchema>) {
-  setServerError(null);
-  startTransition(async () => {
-    const res = await signInWithPasswordAction(values);
-    if (res?.error) setServerError(res.error);
-  });
-}
-  async function onRegister(values: z.infer<typeof registerSchema>) {
-    setLoading(true);
+  async function onLogin(values: z.infer<typeof loginSchema>) {
     setServerError(null);
+    startTransition(async () => {
+      const res = await signInWithPasswordAction(values);
+      if (res?.error) setServerError(res.error);
+    });
+  }
+async function onRegister(values: z.infer<typeof registerSchema>) {
+  setLoading(true);
+  setServerError(null);
+
+  try {
     const { data, error } = await supabase.auth.signUp({
       email: values.email,
       password: values.password,
+      // Doğrulama zorunlu değil, o yüzden options koymaya gerek yok
     });
-    setLoading(false);
+
     if (error) {
+      toast.error(error.message);
       setServerError(error.message);
       return;
     }
-    if (!data.user || !data.session) {
-      alert(
-        "Kayıt oluşturuldu. Lütfen e-postana gelen doğrulama bağlantısını kontrol et."
-      );
-      router.push("/");
-      return;
-    }
-    router.replace("/");
-    router.refresh();
-  }
 
- 
+    // Session varsa -> otomatik giriş
+    if (data.session) {
+      toast.success("Hoş geldin!");
+      router.replace("/");
+      router.refresh();
+    } else {
+      // Çok nadiren session null dönebilir (policy'lere bağlı)
+      toast.info("Kayıt başarılı, giriş yapabilirsin.");
+      setTab("login");
+    }
+  } catch (e: any) {
+    const msg = e?.message || "Bilinmeyen bir hata oluştu.";
+    setServerError(msg);
+    toast.error(msg);
+  } finally {
+    setLoading(false);
+  }
+}
+
+
+
 
   return (
-<main className="relative min-h-[calc(100dvh-62px)] text-white">
+    <main className="relative min-h-[calc(100dvh-62px)] text-white">
       <div
         className="absolute inset-0 -z-10 bg-cover bg-center"
         style={{ backgroundImage: `url(${BG_URL})` }}
@@ -104,7 +120,7 @@ async function onLogin(values: z.infer<typeof loginSchema>) {
             <div className="rounded-3xl border border-white/15 bg-white/5 backdrop-blur-sm p-8 h-full flex flex-col justify-between shadow-[0_10px_60px_rgba(0,0,0,.5)]">
               <div>
                 <h1 className="text-4xl font-extrabold tracking-tight">
-                  Phonetic Karaoke 🎤
+                  AyLovYu
                 </h1>
                 <p className="mt-2 text-white/80">
                   İngilizce şarkılar • Türkçe okunuş • Türkçe anlam. Favori
@@ -159,9 +175,6 @@ async function onLogin(values: z.infer<typeof loginSchema>) {
                 </button>
               </div>
 
-            
-
-
               {tab === "login" ? (
                 <form
                   onSubmit={handleLoginSubmit(onLogin)}
@@ -180,7 +193,6 @@ async function onLogin(values: z.infer<typeof loginSchema>) {
                   <Field label="Şifre" error={loginErrors.password?.message}>
                     <PasswordInput
                       placeholder="••••••••"
-                      
                       {...regLogin("password")}
                       disabled={loading}
                     />
@@ -332,7 +344,7 @@ const PasswordInput = React.forwardRef<
         ref={ref}
         type={show ? "text" : "password"}
         autoComplete={props.autoComplete ?? "current-password"}
-        className={`form-input ${className}`} 
+        className={`form-input ${className}`}
         {...props}
       />
       <button
@@ -358,7 +370,6 @@ const PasswordInput = React.forwardRef<
             />
           </svg>
         ) : (
-          
           <svg
             width="18"
             height="18"
@@ -382,7 +393,7 @@ const PasswordInput = React.forwardRef<
           </svg>
         )}
       </button>
-       <style jsx>{`
+      <style jsx>{`
         .form-input {
           width: 100%;
           height: 44px;

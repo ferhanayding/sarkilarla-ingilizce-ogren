@@ -6,6 +6,7 @@ import AuthProvider from "./context/auth/auth-provider";
 import { supabaseServerComponent } from "@/lib/supabase/server";
 import { themeStyle } from "@/ui/theme/config";
 import SwrProvider from "./providers/swr-provider";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -47,6 +48,7 @@ export default async function RootLayout({
             <Topbar />
 
             {children}
+            <Toaster richColors closeButton position="top-center" />
           </SwrProvider>
         </AuthProvider>
       </body>

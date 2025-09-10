@@ -2,6 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { Modal } from "../ui/modal";
+import { Button } from "../ui/button";
 
 export type ConfirmDialogProps = {
   open: boolean;
@@ -44,7 +45,7 @@ export function ConfirmDialog({
 
   const confirmBtnClass = danger
     ? "bg-[rgb(var(--error,220_38_38))] hover:bg-[rgb(var(--error,220_38_38))]/90"
-    : "bg-[rgb(var(--accent,37_99_235))] hover:bg-[rgb(var(--accent,37_99_235))]/90";
+    : "bg-[rgb(var(--error,37_99_235))] hover:bg-[rgb(var(--error,37_99_235))]/90";
 
   return (
     <Modal
@@ -58,9 +59,10 @@ export function ConfirmDialog({
       className="bg-[rgb(var(--brand2,38_44_56))]"
       footer={
         <div className="flex items-center justify-end gap-2">
-          <button
+          <Button
             ref={cancelRef}
             type="button"
+            
             onClick={onCancel}
             disabled={loading}
             className="inline-flex h-9 px-3 items-center justify-center rounded-xl
@@ -68,8 +70,8 @@ export function ConfirmDialog({
                        text-white text-sm transition disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {cancelText}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={handleConfirm}
             disabled={loading}
@@ -84,7 +86,7 @@ export function ConfirmDialog({
             ) : (
               confirmText
             )}
-          </button>
+          </Button>
         </div>
       }
     />

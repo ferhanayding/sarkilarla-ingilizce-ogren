@@ -19,14 +19,11 @@ export default function Topbar() {
   const pathname = usePathname();
   const isAuth = pathname.startsWith("/auth");
   const { userEmail, checking, signOut } = useAuth();
-  
+
   const [scrolled, setScrolled] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
-  useEffect(() => {
+  useEffect(() => {}, [isAuth]);
 
-
-  }, [isAuth]);  
-      
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
@@ -71,14 +68,7 @@ export default function Topbar() {
                   <span className="hidden sm:inline">Hakkımızda</span>
                 </NavLink>
 
-                <NavLink
-                  href="/favorites"
-                  active={pathname.startsWith("/favorites")}
-                  title="Favorilerim"
-                >
-                  <HeartIcon />
-                  <span className="hidden sm:inline">Favorilerim</span>
-                </NavLink>
+
               </div>
             </>
           ) : (
@@ -106,14 +96,16 @@ export default function Topbar() {
                   <span className="hidden sm:inline">Hakkımızda</span>
                 </NavLink>
 
-                <NavLink
-                  href="/favorites"
-                  active={pathname.startsWith("/favorites")}
-                  title="Favorilerim"
-                >
-                  <HeartIcon />
-                  <span className="hidden sm:inline">Favorilerim</span>
-                </NavLink>
+                {checking && (
+                  <NavLink
+                    href="/favorites"
+                    active={pathname.startsWith("/favorites")}
+                    title="Favorilerim"
+                  >
+                    <HeartIcon />
+                    <span className="hidden sm:inline">Favorilerim</span>
+                  </NavLink>
+                )}
 
                 {checking ? (
                   <div className="h-9 w-28 rounded-xl border border-white/15 bg-white/10 animate-pulse" />
