@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { Song } from "@/types/songs";
+import { Song, SongLite } from "@/types/songs";
 import { ArrowRightIcon } from "../icons/arrow-right";
 import { chipTone } from "@/ui/theme/utils";
 
-export default function SongCard({ song }: { song: Song }) {
+export default function SongCard({ song }: { song: SongLite }) {
   return (
     <Link
       href={`/song/${song.slug}`}

@@ -14,3 +14,7 @@ export type Song = {
   lines: LyricLine[]; // zamanlı satırlar
   tags?: string[]; // arama için opsiyonel etiketler
 };
+export type SongLite = {
+  id: string; slug: string; title: string; artist: string;
+  youtube_id?: string; tags?: string[]; created_at?: string;
+};

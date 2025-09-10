@@ -1,23 +1,29 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { Song } from "@/types/songs";
+import { SongLite } from "@/types/songs";
 
 import SearchBar from "../searchbar";
 import EmptyState from "../empty-state";
 import SongCard from "../song-card";
 import SongListRows from "../song-table";
 import { useIsSmUp } from "@/app/hooks/useIsSmUp";
+import { useSongs } from "@/app/action/songs";
+import { CardGridSkeleton } from "../ui/loading";
+import { ListSkeleton } from "../icons/list-skeleton";
+import { GridIcon } from "../icons/grid-icon";
+import { ListIcon } from "../icons/list-icon";
 
 type ViewMode = "grid" | "list";
 
-export default function HomeClient({ songs }: { songs: Song[] }) {
+export default function HomeClient() {
   const [q, setQ] = useState("");
+  const [view, setView] = useState<ViewMode>("grid");
+  const twoCols = useIsSmUp();
+
   const [_userEmail, setUserEmail] = useState<string | null>(null);
   const [_checking, setChecking] = useState(true);
-  const [view, setView] = useState<ViewMode>("grid"); // 👈 toggle state
-  const twoCols = useIsSmUp();
   useEffect(() => {
     let mounted = true;
     supabase.auth.getUser().then(({ data }) => {
@@ -30,26 +36,24 @@ export default function HomeClient({ songs }: { songs: Song[] }) {
     };
   }, []);
 
-  const filtered = useMemo(() => {
-    const term = q.trim().toLowerCase();
-    if (!term) return songs;
-    return songs.filter((s) => {
-      const hay = [s.title, s.artist, s.slug, ...(s.tags ?? [])]
-        .join(" ")
-        .toLowerCase();
-      return hay.includes(term);
-    });
-  }, [q, songs]);
+  const { items, isLoading } = useSongs(q, 30, 0);
+
+  const data: SongLite[] = useMemo(() => {
+    if (items && items.length > 0) return items;
+    if (!isLoading && q) return [];
+    return items;
+  }, [items, isLoading, q]);
+
+  const showingGrid = view === "grid" && twoCols;
+  const count = isLoading ? 0 : data.length;
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-[rgb(24,35,50)]">
       <section className="mx-auto max-w-6xl px-4 pt-8 pb-4">
-        {/* başlık + toggle üst sağ */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          {/* 👇 mobilde ortada, sm+ solda */}
-          <div className=" sm:flex sm:items-center sm:justify-between  text-center sm:text-left self-center sm:self-auto w-full">
+          <div className="sm:flex sm:items-center sm:justify-between text-center sm:text-left self-center sm:self-auto w-full">
             <p className="opacity-70 text-sm sm:text-base text-white/100">
-              İngilizce şarkılar • Türkçe okunuş • Türkçe anlam
+              • İngilizce şarkılar • Türkçe okunuş • Türkçe anlam
             </p>
 
             {twoCols && (
@@ -89,42 +93,29 @@ export default function HomeClient({ songs }: { songs: Song[] }) {
         </div>
 
         <div className="mt-4">
-          <SearchBar value={q} onChange={setQ} count={filtered.length} />
+          <SearchBar value={q} onChange={setQ} count={count} />
         </div>
       </section>
 
       <main className="mx-auto max-w-6xl px-4 pb-12">
-        {filtered.length === 0 ? (
+        {isLoading ? (
+          showingGrid ? (
+            <CardGridSkeleton />
+          ) : (
+            <ListSkeleton />
+          )
+        ) : data.length === 0 ? (
           <EmptyState query={q} />
-        ) : view === "grid" && twoCols ? (
+        ) : showingGrid ? (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((s) => (
+            {data.map((s) => (
               <SongCard key={s.slug} song={s} />
             ))}
           </div>
         ) : (
-          <SongListRows songs={filtered} />
+          <SongListRows songs={data} />
         )}
       </main>
     </div>
-  );
-}
-
-/* ikonlar */
-function GridIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" {...props}>
-      <path
-        d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
-function ListIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" {...props}>
-      <path d="M4 6h16v3H4zm0 5h16v3H4zm0 5h16v3H4z" fill="currentColor" />
-    </svg>
   );
 }

@@ -5,6 +5,7 @@ import Topbar from "./components/topbar";
 import AuthProvider from "./context/auth/auth-provider";
 import { supabaseServerComponent } from "@/lib/supabase/server";
 import { themeStyle } from "@/ui/theme/config";
+import SwrProvider from "./providers/swr-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,10 +19,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Şarkılarla İngilizce Öğren",
-  description: "İngilizce şarkılarla İngilizce öğren, okunuş ve anlamlarıyla birlikte.",
-    icons: {
-    icon: "/logom-light.png",  
-    apple: "/logom-light.png", 
+  description:
+    "İngilizce şarkılarla İngilizce öğren, okunuş ve anlamlarıyla birlikte.",
+  icons: {
+    icon: "/logom-light.png",
+    apple: "/logom-light.png",
   },
 };
 
@@ -36,16 +38,18 @@ export default async function RootLayout({
   } = await supabase.auth.getUser();
   return (
     <html lang="en">
-        <body  style={themeStyle}  
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-      <AuthProvider 
-        initialUserEmail={user?.email}
+      <body
+        style={themeStyle}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Topbar />
-          {children}
-      </AuthProvider>
-        </body>
+        <AuthProvider initialUserEmail={user?.email}>
+          <SwrProvider>
+            <Topbar />
+
+            {children}
+          </SwrProvider>
+        </AuthProvider>
+      </body>
     </html>
   );
 }
