@@ -1,22 +1,25 @@
-import { NextRequest } from "next/server";
-import { supabaseServerComponent } from "@/lib/supabase/server";
+// app/api/songs/[slug]/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import { supabaseRoute } from "@/lib/supabase/server";
 
 export async function GET(
   req: NextRequest,
-  context: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
-  const { slug } = context.params;
+  // params artık Promise -> await et
+  const { slug } = await params;
 
-  const supabase = await supabaseServerComponent();
+  const { supabase, res } = supabaseRoute(req);
+
   const { data, error } = await supabase
     .from("songs")
-    .select("*")
+    .select("slug,title,artist,youtubeId,lines,tags")
     .eq("slug", slug)
-    .single();
+    .maybeSingle();
 
   if (error) {
-    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return new Response(JSON.stringify(data), { status: 200 });
+  return NextResponse.json(data ?? null, { headers: res.headers });
 }
