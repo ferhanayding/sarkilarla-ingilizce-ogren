@@ -1,14 +1,22 @@
-import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { supabaseServerComponent } from "@/lib/supabase/server";
 
-export async function GET(_: Request, { params }: { params: { slug: string } }) {
+export async function GET(
+  req: NextRequest,
+  context: { params: { slug: string } }
+) {
+  const { slug } = context.params;
+
   const supabase = await supabaseServerComponent();
   const { data, error } = await supabase
     .from("songs")
-    .select("id,slug,title,artist,youtube_id,tags,lines,created_at")
-    .eq("slug", params.slug)
+    .select("*")
+    .eq("slug", slug)
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 404 });
-  return NextResponse.json(data);
+  if (error) {
+    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+  }
+
+  return new Response(JSON.stringify(data), { status: 200 });
 }
