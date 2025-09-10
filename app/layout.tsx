@@ -19,8 +19,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Şarkılarla İngilizce Öğren",
   description: "İngilizce şarkılarla İngilizce öğren, okunuş ve anlamlarıyla birlikte.",
-  icons: {
-    icon: "/logom-light.png",
+    icons: {
+    icon: "/logom-light.png",  
+    apple: "/logom-light.png", 
   },
 };
 
