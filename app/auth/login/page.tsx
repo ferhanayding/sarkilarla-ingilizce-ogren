@@ -8,15 +8,14 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { supabase } from "@/lib/supabase/client";
 import { signInWithPasswordAction } from "@/app/action/auth";
-import { toast } from "sonner"; // 👈 ekle
+import { toast } from "sonner"; 
 
-// Arka plan görseli (blur arkasında kalır)
 const BG_URL =
   "https://images.unsplash.com/photo-1511192336575-5a79af67a629?q=80&w=1974&auto=format&fit=crop";
 
 type Tab = "login" | "register";
 
-// Şemalar
+
 const loginSchema = z.object({
   email: z.string().email("Geçerli bir e-posta gir"),
   password: z.string().min(5, "En az 5 karakter"),
@@ -57,7 +56,6 @@ export default function LoginPage() {
     defaultValues: { email: "", password: "", confirm: "" },
   });
   const [pending, startTransition] = React.useTransition();
-const [infoMessage, setInfoMessage] = useState<string | null>(null);
 
   async function onLogin(values: z.infer<typeof loginSchema>) {
     setServerError(null);
@@ -74,7 +72,6 @@ async function onRegister(values: z.infer<typeof registerSchema>) {
     const { data, error } = await supabase.auth.signUp({
       email: values.email,
       password: values.password,
-      // Doğrulama zorunlu değil, o yüzden options koymaya gerek yok
     });
 
     if (error) {
@@ -83,13 +80,11 @@ async function onRegister(values: z.infer<typeof registerSchema>) {
       return;
     }
 
-    // Session varsa -> otomatik giriş
     if (data.session) {
       toast.success("Hoş geldin!");
       router.replace("/");
       router.refresh();
     } else {
-      // Çok nadiren session null dönebilir (policy'lere bağlı)
       toast.info("Kayıt başarılı, giriş yapabilirsin.");
       setTab("login");
     }
