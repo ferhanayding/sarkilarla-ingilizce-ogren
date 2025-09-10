@@ -4,11 +4,12 @@ import * as React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { set, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { supabase } from "@/lib/supabase/client";
 import { signInWithPasswordAction } from "@/app/action/auth";
 import { toast } from "sonner"; 
+import { Button } from "@/app/components/ui/button";
 
 const BG_URL =
   "https://images.unsplash.com/photo-1511192336575-5a79af67a629?q=80&w=1974&auto=format&fit=crop";
@@ -58,11 +59,13 @@ export default function LoginPage() {
   const [pending, startTransition] = React.useTransition();
 
   async function onLogin(values: z.infer<typeof loginSchema>) {
+    setLoading(true);
     setServerError(null);
     startTransition(async () => {
       const res = await signInWithPasswordAction(values);
       if (res?.error) setServerError(res.error);
     });
+    setLoading(false);
   }
 async function onRegister(values: z.infer<typeof registerSchema>) {
   setLoading(true);
@@ -81,9 +84,8 @@ async function onRegister(values: z.infer<typeof registerSchema>) {
     }
 
     if (data.session) {
-      toast.success("Hoş geldin!");
-      router.replace("/");
-      router.refresh();
+      toast.success("Kayıt başarılı, giriş yapabilirsin.");
+       setTab("login");
     } else {
       toast.info("Kayıt başarılı, giriş yapabilirsin.");
       setTab("login");
@@ -210,12 +212,12 @@ async function onRegister(values: z.infer<typeof registerSchema>) {
                     </a>
                   </div>
 
-                  <button
-                    className="w-full h-11 rounded-xl bg-gradient-to-tr from-indigo-600 to-rose-500 hover:brightness-105 active:scale-[0.99] transition disabled:opacity-60"
-                    disabled={loading}
+                  <Button
+                    className="w-full h-11  bg-gradient-to-tr from-indigo-600 to-rose-500 hover:brightness-105 active:scale-[0.99] transition disabled:opacity-60"
+                    loading={loading}
                   >
                     {loading ? "Giriş yapılıyor…" : "Giriş yap"}
-                  </button>
+                  </Button>
                 </form>
               ) : (
                 <form
