@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Song, SongLite } from "@/types/songs";
+import {  SongLite } from "@/types/songs";
 import { useIsSmUp } from "@/app/hooks/useIsSmUp";
 
 export default function SongListRows({ songs }: { songs: SongLite[] }) {
