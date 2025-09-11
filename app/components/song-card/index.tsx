@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Song, SongLite } from "@/types/songs";
+import {  SongLite } from "@/types/songs";
 import { ArrowRightIcon } from "../icons/arrow-right";
 import { chipTone } from "@/ui/theme/utils";
 
