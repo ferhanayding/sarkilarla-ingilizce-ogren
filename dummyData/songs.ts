@@ -1,11 +1,11 @@
-import { Song } from "@/types/songs";
+import { SongType } from "@/types/songs";
 
-export const SONGS: Song[] = [
+export const SONGS: SongType[] = [
   {
     slug: "nothing-else-matters",
     title: "Nothing Else Matters",
     artist: "Metallica",
-    youtubeId: "tAGnKpE4NCI",
+    youtube_id: "tAGnKpE4NCI",
     lines: [
       {
         t: "0.0",
@@ -248,7 +248,7 @@ export const SONGS: Song[] = [
     slug: "back-to-black",
     title: "Back to Black",
     artist: "Amy Winehouse",
-    youtubeId: "TJAfLE39ZZ8",
+    youtube_id: "TJAfLE39ZZ8",
     lines: [
       {
         t: "0.00",
@@ -449,7 +449,7 @@ export const SONGS: Song[] = [
     slug: "billie-jean",
     title: "Billie Jean",
     artist: "Michael Jackson",
-    youtubeId: "Zi_XLOBDo_Y",
+    youtube_id: "Zi_XLOBDo_Y",
     lines: [
       {
         t: "0.00",
@@ -824,7 +824,7 @@ export const SONGS: Song[] = [
     slug: "shape-of-my-heart",
     title: "Shape of My Heart",
     artist: "Sting",
-    youtubeId: "QK-Z1K67uaA",
+    youtube_id: "QK-Z1K67uaA",
     lines: [
       {
         t: "0.00",
@@ -1060,7 +1060,7 @@ export const SONGS: Song[] = [
   slug: "what-a-wonderful-world",
   title: "What a Wonderful World",
   artist: "Louis Armstrong",
-  youtubeId: "CWzrABouyeE",
+  youtube_id: "CWzrABouyeE",
   lines: [
     {
       t: "0.00",

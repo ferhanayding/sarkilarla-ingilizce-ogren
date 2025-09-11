@@ -6,11 +6,11 @@ export type LyricLine = {
   ph: string; // Türkçe okunuş (fenotip) (elle)
 };
 
-export type Song = {
+export type SongType = {
   slug: string; // /song/[slug]
   title: string; // şarkı adı
   artist: string; // sanatçı
-  youtubeId: string; // YouTube video ID (örn: "kXYiU_JCYtU")
+  youtube_id: string; // YouTube video ID (örn: "kXYiU_JCYtU")
   lines: LyricLine[]; // zamanlı satırlar
   tags?: string[]; // arama için opsiyonel etiketler
 };
@@ -18,3 +18,4 @@ export type SongLite = {
   id: string; slug: string; title: string; artist: string;
   youtube_id?: string; tags?: string[]; created_at?: string;
 };
+

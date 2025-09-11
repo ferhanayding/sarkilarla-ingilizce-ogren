@@ -6,6 +6,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 const SUPABASE_URL  = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON!;
 
+// (Server Component / Server Action için) — sende zaten var, dokunmadım
 async function getCookieStore() {
   return (await Promise.resolve(cookies() as any)) as {
     get: (name: string) => { value: string } | undefined;
@@ -20,16 +21,16 @@ export async function supabaseServerComponent() {
       get(name: string) {
         return cookieStore.get(name)?.value;
       },
-      set(_name: string, _value: string, _opts?: CookieOptions) {
-      },
-      remove(_name: string, _opts?: CookieOptions) {
-      },
+      set(_name: string, _value: string, _opts?: CookieOptions) {},
+      remove(_name: string, _opts?: CookieOptions) {},
     },
   });
 }
 
+// ✅ MIDDLEWARE DEĞİL: next() KULLANMA!
 export function supabaseRoute(req: NextRequest) {
-  const res = NextResponse.next();
+  const res = new NextResponse(); // <-- BURADA DÜZELTME
+
   const client = createServerClient(SUPABASE_URL, SUPABASE_ANON, {
     cookies: {
       get(name: string) {
@@ -43,6 +44,7 @@ export function supabaseRoute(req: NextRequest) {
       },
     },
   });
+
   return { supabase: client, res };
 }
 
