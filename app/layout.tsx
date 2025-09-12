@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   ),
   title: {
     default: "Aylavyu",
-    template: "%s • Sing & Learn",
+    template: "%s • Sing & Learn with Lyrics ",
   },
   description: "Şarkı sözleriyle telaffuz ve çeviri – YouTube ile eşzamanlı.",
   alternates: { canonical: "/" },
@@ -34,7 +34,6 @@ export const metadata: Metadata = {
     url: "/",
   },
   twitter: { card: "summary_large_image" },
- 
 };
 
 export default async function RootLayout({
@@ -47,7 +46,7 @@ export default async function RootLayout({
     data: { user },
   } = await supabase.auth.getUser();
   return (
-    <html lang="en">
+    <html lang="tr">
       <body
         style={themeStyle}
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
