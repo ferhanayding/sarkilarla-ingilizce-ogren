@@ -126,7 +126,7 @@ function SongDetail({ song }: { song: SongType }) {
                 </p>
               </div>
 
-              <div className="inline-flex rounded-xl border border-white/10 bg-white/5 p-1">
+              <div className="sm:inline-flex max-w-max mx-auto rounded-xl border border-white/10 bg-white/5 p-1">
                 <SegBtn
                   active={view === "full"}
                   onClick={() => setView("full")}
@@ -250,7 +250,7 @@ function SongDetail({ song }: { song: SongType }) {
                                 className={[
                                   "tracking-wide break-words",
                                   isInActive
-                                    ? "text-fuchsia-200 font-extrabold text-base sm:text-lg lg:text-2xl drop-shadow-[0_0_20px_rgba(255,0,180,.25)]"
+                                    ? "text-fuchsia-400 font-extrabold text-base sm:text-lg lg:text-2xl drop-shadow-[0_0_20px_rgba(255,0,180,.25)]"
                                     : "text-fuchsia-200/85 font-bold text-sm sm:text-base lg:text-xl",
                                 ].join(" ")}
                               >
