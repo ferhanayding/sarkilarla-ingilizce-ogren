@@ -19,13 +19,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Şarkılarla İngilizce Öğren",
-  description:
-    "İngilizce şarkılarla İngilizce öğren, okunuş ve anlamlarıyla birlikte.",
-  icons: {
-    icon: "/logom-light.png",
-    apple: "/logom-light.png",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://example.com"
+  ),
+  title: {
+    default: "Aylavyu",
+    template: "%s • Sing & Learn",
   },
+  description: "Şarkı sözleriyle telaffuz ve çeviri – YouTube ile eşzamanlı.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: "aylavyu",
+    url: "/",
+  },
+  twitter: { card: "summary_large_image" },
+ 
 };
 
 export default async function RootLayout({

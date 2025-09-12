@@ -124,7 +124,7 @@ export default function Topbar() {
                   <Link
                     href="/auth/login"
                     className="inline-flex items-center gap-2 h-9 rounded-xl px-3 text-sm text-white shadow
-                               bg-[rgb(var(--accent))] hover:bg-[rgb(var(--accent))/0.92]
+                               bg-[rgb(var(--success))] hover:bg-[rgb(var(--accent))/0.92]
                                hover:brightness-110 active:scale-[0.98] transition cursor-pointer"
                   >
                     <LogInIcon size={16} className="opacity-95" />
