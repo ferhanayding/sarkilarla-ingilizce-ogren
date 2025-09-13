@@ -1,62 +1,63 @@
+// components/SongDetailSkeleton.tsx (ya da mevcut dosyandaki export'un yerine)
+
+// GÜNCEL SKELET
 export function SongDetailSkeleton() {
   return (
     <main className="min-h-dvh bg-brand3 text-white">
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
-        <div className="max-w-screen-2xl mx-auto space-y-6">
-          {/* Header skeleton */}
-          <div className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-5 sm:px-7 sm:py-3 shadow-[0_10px_40px_rgba(0,0,0,.45)]">
+        <div className="max-w-6xl mx-auto space-y-6">
+          {/* Video skeleton (merkezde tek kolon) */}
+          <section className="relative w-full mx-auto md:w-3/4 lg:w-1/2 rounded-2xl overflow-hidden border border-white/10 bg-white/[0.04] shadow-[0_10px_40px_rgba(0,0,0,.55)]">
+            <div className="relative w-full mx-auto aspect-video">
+              <SkeletonLine className="absolute inset-0 rounded-none" />
+            </div>
+          </section>
+
+          {/* Header skeleton (başlık + seg buttons + autoplay) */}
+          <header className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-5 sm:px-7 sm:py-3 shadow-[0_10px_40px_rgba(0,0,0,.45)]">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
               <div>
                 <SkeletonLine className="h-7 sm:h-8 w-52 sm:w-72 mb-2" />
                 <SkeletonLine className="h-4 w-40" />
               </div>
-              <div className="inline-flex gap-2 p-1 rounded-xl border border-white/10 bg-white/5">
+
+              <div className="sm:inline-flex max-w-max mx-auto rounded-xl border border-white/10 bg-white/5 p-1">
+                <SkeletonLine className="h-9 w-14 rounded-lg" />
+                <SkeletonLine className="h-9 w-20 rounded-lg mx-1" />
                 <SkeletonLine className="h-9 w-16 rounded-lg" />
-                <SkeletonLine className="h-9 w-24 rounded-lg" />
-                <SkeletonLine className="h-9 w-20 rounded-lg" />
               </div>
-              <SkeletonLine className="h-9 w-28 rounded-lg" />
-            </div>
-          </div>
 
-          {/* Content skeleton: video + lyrics */}
-          <section className="grid lg:grid-cols-12 gap-6 lg:gap-8">
-            <div className="lg:col-span-5 space-y-4">
-              <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-white/[0.04] shadow-[0_10px_40px_rgba(0,0,0,.55)] aspect-video">
-                <SkeletonLine className="absolute inset-0 rounded-none" />
-              </div>
-              <div className="flex justify-center gap-3 text-xs sm:text-sm font-mono text-white/75">
-                <SkeletonLine className="h-7 w-20 rounded-md" />
-              </div>
+              <SkeletonLine className="h-9 w-32 rounded-lg" />
             </div>
+          </header>
 
-            <div className="lg:col-span-7">
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-2 sm:p-3 shadow-[0_10px_40px_rgba(0,0,0,.45)]">
-                <div className="h-[66vh] sm:h-[72vh] lg:h-[calc(100dvh-340px)] overflow-auto lyricsScroll space-y-2">
-                  {Array.from({ length: 12 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="grid grid-cols-[1fr_auto] gap-3 px-3 sm:px-4 py-3 rounded-xl"
-                    >
-                      <div>
-                        <div className="flex items-start gap-2">
-                          <SkeletonLine className="h-4 w-1 rounded-full mt-1" />
-                          <SkeletonLine className="h-6 sm:h-7 w-2/3" />
-                        </div>
-                        <SkeletonLine className="h-3 w-1/2 mt-2" />
-                        <SkeletonLine className="h-3 w-2/5 mt-1" />
+          {/* Lyrics skeleton (yeni kart düzeni ile aynı) */}
+          <section>
+            <div className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-2 sm:p-3 shadow-[0_10px_40px_rgba(0,0,0,.45)]">
+              <div className="h-[66vh] sm:h-[72vh] lg:h-[calc(100dvh-340px)] overflow-auto lyricsScroll space-y-2">
+                {Array.from({ length: 14 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="grid grid-cols-[1fr_auto] items-start gap-x-3 rounded-xl px-3 sm:px-4 py-3 sm:py-3.5"
+                  >
+                    <div className="min-w-0">
+                      <div className="flex items-start gap-2">
+                        <SkeletonLine className="h-4 w-1 rounded-full mt-1" />
+                        <SkeletonLine className="h-5 sm:h-6 lg:h-7 w-2/3" />
                       </div>
-                      <SkeletonLine className="h-7 w-12 rounded-md" />
+                      <SkeletonLine className="h-3 w-1/2 mt-2" />
+                      <SkeletonLine className="h-3 w-2/5 mt-1" />
                     </div>
-                  ))}
-                </div>
+                    <SkeletonLine className="h-7 w-12 rounded-md" />
+                  </div>
+                ))}
               </div>
             </div>
           </section>
         </div>
       </div>
 
-      {/* keyframes for shimmer */}
+      {/* keyframes for shimmer & scrollbar styling */}
       <style jsx>{`
         @keyframes shimmer {
           0% {
@@ -87,12 +88,13 @@ export function SongDetailSkeleton() {
     </main>
   );
 }
+
 function SkeletonLine({ className = "" }: { className?: string }) {
   return (
     <div
       className={[
         "rounded-md bg-white/10",
-        "[background-image:linear-gradient(90deg,rgba(255,255,255,0)_0%,rgba(255,255,255,.15)_50%,rgba(255,255,255,0)_100%)]",
+        "[background-image:linear-gradient(90deg,rgba(255,255,255,0)_0%,rgba(255,255,255,.16)_50%,rgba(255,255,255,0)_100%)]",
         "bg-[length:200%_100%] ",
         className,
       ].join(" ")}

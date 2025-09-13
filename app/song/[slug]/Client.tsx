@@ -10,6 +10,7 @@ import { ErrorState } from "@/app/components/song-detail/error";
 import { SegBtn } from "@/app/components/song-detail/seg-button";
 import { formatTime, toSecondsOrNull } from "@/lib/ui";
 import { Button } from "@/app/components/ui/button";
+import { Maximize2, Minimize2 } from "lucide-react";
 
 type Line = { t: string | null; en: string; tr: string; ph: string };
 type ViewMode = "full" | "phOnly" | "phFocus";
@@ -46,7 +47,8 @@ function SongDetail({ song }: { song: SongType }) {
   const playerRef = useRef<YouTubePlayer | null>(null);
   const [sec, setSec] = useState(0);
   const [view, setView] = useState<ViewMode>("full");
-  const [autoplay, setAutoplay] = useState(true);
+  const [autoplay, setAutoplay] = useState<boolean>(true);
+  const [lyricsExpanded, setLyricsExpanded] = useState(false);
 
   const timedIdxs = useMemo(() => {
     const arr: { i: number; t: number }[] = [];
@@ -91,9 +93,16 @@ function SongDetail({ song }: { song: SongType }) {
 
   const onReady = (e: any) => {
     playerRef.current = e.target;
-    if (!autoplay) {
+
+    if (autoplay) {
       try {
-        e.target.pauseVideo?.();
+        e.target.playVideo(); // autoplay için elle başlat
+      } catch (err) {
+        console.error("Oynatma hatası", err);
+      }
+    } else {
+      try {
+        e.target.pauseVideo();
       } catch {}
     }
   };
@@ -111,11 +120,29 @@ function SongDetail({ song }: { song: SongType }) {
   return (
     <main className="min-h-dvh bg-brand3 text-white">
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
-        <div className="max-w-screen-2xl mx-auto space-y-6">
+        <div className="max-w-6xl mx-auto space-y-6">
+          {showVideo && (
+            <section className=" relative w-full mx-auto md:w-3/4 lg:w-1/2 rounded-2xl overflow-hidden border border-white/10 bg-white/[0.04] shadow-[0_10px_40px_rgba(0,0,0,.55)]">
+              <div className="relative w-full mx-auto aspect-video">
+                <YouTube
+                  videoId={song.youtube_id}
+                  opts={{
+                    ...YT_OPTS,
+                    playerVars: { ...YT_OPTS.playerVars, autoplay },
+                  }}
+                  onReady={onReady}
+                  className="absolute inset-0"
+                  iframeClassName="w-full h-full"
+                />
+              </div>
+            </section>
+          )}
+
           <header className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-5 sm:px-7 sm:py-3 shadow-[0_10px_40px_rgba(0,0,0,.45)]">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-              <div>
-                <h1 className="text-2lg mx-auto sm:text-xl lg:text-2xl font-extrabold tracking-tight">
+            <div className="grid gap-4 lg:grid-cols-[1fr_auto_auto] lg:items-center">
+              {/* Başlık */}
+              <div className="text-center lg:text-left">
+                <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
                   {song.title}
                 </h1>
                 <p className="mt-1 text-sm sm:text-base text-white/80">
@@ -123,53 +150,71 @@ function SongDetail({ song }: { song: SongType }) {
                 </p>
               </div>
 
-              <div className="sm:inline-flex max-w-max mx-auto rounded-xl border border-white/10 bg-white/5 p-1">
-                <SegBtn
-                  active={view === "full"}
-                  onClick={() => setView("full")}
-                  label="Tümü"
-                />
-                <SegBtn
-                  active={view === "phOnly"}
-                  onClick={() => setView("phOnly")}
-                  label="Sadece Ph"
-                />
-                <SegBtn
-                  active={view === "phFocus"}
-                  onClick={() => setView("phFocus")}
-                  label="Ph Odak"
-                />
+              {/* Segmented Buttons */}
+              <div className="order-3 lg:order-none sm:justify-self-center">
+                <div className="inline-flex w-full sm:w-auto rounded-xl border border-white/10 bg-white/5 p-1">
+                  <SegBtn
+                    active={view === "full"}
+                    onClick={() => setView("full")}
+                    label="Tümü"
+                    className="h-9 px-4 text-sm rounded-lg min-w-[84px]"
+                  />
+                  <SegBtn
+                    active={view === "phOnly"}
+                    onClick={() => setView("phOnly")}
+                    label="Sadece Ph"
+                    className="h-9 px-4 text-sm rounded-lg min-w-[106px]"
+                  />
+                  <SegBtn
+                    active={view === "phFocus"}
+                    onClick={() => setView("phFocus")}
+                    label="Ph Odak"
+                    className="h-9 px-4 text-sm rounded-lg min-w-[96px]"
+                  />
+                </div>
               </div>
 
-              <Button
-                onClick={() => {
-                  setAutoplay((a) => {
-                    const nxt = !a;
-                    if (!nxt) {
-                      try {
-                        playerRef.current?.pauseVideo?.();
-                      } catch {}
-                    }
-                    return nxt;
-                  });
-                }}
-                className={[
-                  "h-9 px-3 rounded-lg text-sm border transition",
-                  autoplay
-                    ? "border-emerald-400/50 bg-emerald-500/15"
-                    : "border-white/15 bg-white/5 hover:bg-white/10",
-                ].join(" ")}
-                title="Otomatik oynatma"
-              >
-                Autoplay: {autoplay ? "Açık" : "Kapalı"}
-              </Button>
+              {/* Autoplay */}
+              <div className="order-2 lg:order-none">
+                <Button
+                  onClick={() =>
+                    setAutoplay((a) => {
+                      const nxt = !a;
+                      if (!nxt) {
+                        try {
+                          playerRef.current?.pauseVideo?.();
+                        } catch {}
+                      }
+                      return nxt;
+                    })
+                  }
+                  className={[
+                    "h-9 px-3 text-sm border transition rounded-lg",
+                    "w-full sm:w-auto", // mobilde full width
+                    autoplay
+                      ? "border-emerald-400/50 bg-emerald-500/15"
+                      : "border-white/15 bg-white/5 hover:bg-white/10",
+                  ].join(" ")}
+                  title="Otomatik oynatma"
+                >
+                  Autoplay: {autoplay ? "Açık" : "Kapalı"}
+                </Button>
+              </div>
             </div>
           </header>
 
           {view === "phFocus" ? (
-            <section className="max-w-4xl mx-auto">
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-4 sm:p-6 shadow-[0_10px_40px_rgba(0,0,0,.45)]">
-                <div className="h-[66vh] sm:h-[72vh] lg:h-[calc(100dvh-340px)] overflow-auto px-1 lyricsScroll">
+            <section className="max-w-6xl mx-auto">
+              <div className="relative rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-4 sm:p-6 shadow-[0_10px_40px_rgba(0,0,0,.45)]">
+                <div
+                  className={[
+                    // expanded ise sabit yükseklik ve iç scroll YOK
+                    lyricsExpanded
+                      ? ""
+                      : "h-[66vh] sm:h-[72vh] lg:h-[calc(100dvh-340px)] overflow-auto",
+                    "px-1 lyricsScroll",
+                  ].join(" ")}
+                >
                   {song.lines.map((ln, i) => (
                     <div
                       key={i}
@@ -185,109 +230,107 @@ function SongDetail({ song }: { song: SongType }) {
                     </div>
                   ))}
                 </div>
+
+                {/* Sağ-alt büyüt/küçült butonu */}
+                <button
+                  onClick={() => setLyricsExpanded((v) => !v)}
+                  className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/10 hover:bg-white/15 text-white/90 px-2.5 py-1.5 text-xs sm:text-sm transition"
+                  title={lyricsExpanded ? "Küçült" : "Büyüt"}
+                  aria-label={lyricsExpanded ? "Küçült" : "Büyüt"}
+                >
+                  {lyricsExpanded ? (
+                    <Minimize2 className="h-4 w-4" />
+                  ) : (
+                    <Maximize2 className="h-4 w-4" />
+                  )}
+                  <span className="hidden sm:inline">
+                    {lyricsExpanded ? "Küçült" : "Büyüt"}
+                  </span>
+                </button>
               </div>
             </section>
           ) : (
-            <section className="grid lg:grid-cols-12 gap-6 lg:gap-8">
-              {showVideo && (
-                <div className="lg:col-span-5 space-y-4 lg:sticky lg:top-10 self-start">
-                  <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-white/[0.04] shadow-[0_10px_40px_rgba(0,0,0,.55)] aspect-video">
-                    <YouTube
-                      videoId={song.youtube_id}
-                      opts={{
-                        ...YT_OPTS,
-                        playerVars: {
-                          ...YT_OPTS?.playerVars,
-                          autoplay: autoplay ? 1 : 0,
-                        },
-                      }}
-                      onReady={onReady}
-                      className="absolute inset-0"
-                      iframeClassName="w-full h-full"
-                    />
-                  </div>
-                  <div className="flex justify-center gap-3 text-xs sm:text-sm font-mono text-white/75">
-                    <span className="inline-flex items-center gap-1 rounded-md border border-white/10 bg-white/5 px-2 py-1">
-                      ⏱ {formatTime(sec)}
-                    </span>
-                  </div>
-                </div>
-              )}
+            <section>
+              <div className="relative rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-2 sm:p-3 shadow-[0_10px_40px_rgba(0,0,0,.45)]">
+                <div
+                  className={[
+                    lyricsExpanded
+                      ? "" // expanded: sabit yükseklik yok, iç scroll yok
+                      : "h-[66vh] sm:h-[72vh] lg:h-[calc(100dvh-340px)] overflow-auto",
+                    "lyricsScroll",
+                  ].join(" ")}
+                >
+                  {song.lines.map((ln: Line, i: number) => {
+                    const isInActive =
+                      activeRange.start >= 0 &&
+                      i >= activeRange.start &&
+                      i < activeRange.end;
 
-              <div className={showVideo ? "lg:col-span-7" : "lg:col-span-12"}>
-                <div className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-2 sm:p-3 shadow-[0_10px_40px_rgba(0,0,0,.45)]">
-                  <div className="h-[66vh] sm:h-[72vh] lg:h-[calc(100dvh-340px)] overflow-auto lyricsScroll">
-                    {song.lines.map((ln: Line, i: number) => {
-                      const isInActive =
-                        activeRange.start >= 0 &&
-                        i >= activeRange.start &&
-                        i < activeRange.end;
-
-                      return (
-                        <div
-                          key={i}
-                          ref={i === activeRange.start ? activeRowRef : null}
-                          className={[
-                            "grid grid-cols-[1fr_auto] items-start gap-x-3 rounded-xl px-3 sm:px-4 py-3 sm:py-3.5 transition",
-                            isInActive
-                              ? "bg-white/[0.06] shadow-[0_0_0_1px_rgba(255,255,255,.12)]"
-                              : "hover:bg-white/[0.04]",
-                          ].join(" ")}
-                        >
-                          <div className="min-w-0">
-                            <div className="flex items-start gap-2">
-                              <span
-                                className={[
-                                  "mt-1 block h-4 w-1 rounded-full",
-                                  isInActive
-                                    ? "bg-fuchsia-400/80"
-                                    : "bg-white/10",
-                                ].join(" ")}
-                              />
-                              <p
-                                className={[
-                                  "tracking-wide break-words",
-                                  isInActive
-                                    ? "text-fuchsia-400 font-extrabold text-base sm:text-lg lg:text-2xl drop-shadow-[0_0_20px_rgba(255,0,180,.25)]"
-                                    : "text-fuchsia-200/85 font-bold text-sm sm:text-base lg:text-xl",
-                                ].join(" ")}
-                              >
-                                {ln.ph}
-                              </p>
-                            </div>
-
-                            {view === "full" && (
-                              <>
-                                <p className="mt-1 text-[12px] sm:text-sm italic text-white/85 break-words">
-                                  {ln.en}
-                                </p>
-                                <p className="text-[12px] sm:text-sm text-indigo-200/95 break-words">
-                                  {ln.tr}
-                                </p>
-                              </>
-                            )}
-                          </div>
-
-                          <div className="flex items-start">
-                            <button
-                              onClick={() => seekTo(ln.t)}
-                              disabled={toSecondsOrNull(ln.t) == null}
+                    return (
+                      <div
+                        key={i}
+                        ref={i === activeRange.start ? activeRowRef : null}
+                        className={[
+                          "grid grid-cols-[1fr_auto] items-start gap-x-3 rounded-xl px-3 sm:px-4 py-3 sm:py-3.5 transition",
+                          isInActive
+                            ? "bg-white/[0.06] shadow-[0_0_0_1px_rgba(255,255,255,.12)]"
+                            : "hover:bg-white/[0.04]",
+                        ].join(" ")}
+                      >
+                        <div className="min-w-0">
+                          <div className="flex items-start gap-2">
+                            <span
                               className={[
-                                "whitespace-nowrap tabular-nums font-mono text-[10px] sm:text-[11px] h-7 px-2 rounded-md border transition",
-                                toSecondsOrNull(ln.t) == null
-                                  ? "border-white/10 bg-white/5 text-white/40 cursor-not-allowed"
-                                  : "border-white/15 bg-white/10 hover:bg-white/20 text-white/90",
+                                "mt-1 block h-4 w-1 rounded-full",
+                                isInActive
+                                  ? "bg-fuchsia-400/80"
+                                  : "bg-white/10",
                               ].join(" ")}
-                              title={ln.t ? "Bu zamana atla" : "Zaman yok"}
+                            />
+                            <p
+                              className={[
+                                "tracking-wide break-words",
+                                isInActive
+                                  ? "text-fuchsia-400 font-extrabold text-base sm:text-lg lg:text-2xl drop-shadow-[0_0_20px_rgba(255,0,180,.25)]"
+                                  : "text-fuchsia-200/85 font-bold text-sm sm:text-base lg:text-xl",
+                              ].join(" ")}
                             >
-                              {ln.t ?? "—"}
-                            </button>
+                              {ln.ph}
+                            </p>
                           </div>
+
+                          {view === "full" && (
+                            <>
+                              <p className="mt-1 text-[12px] sm:text-sm italic text-white/85 break-words">
+                                {ln.en}
+                              </p>
+                              <p className="text-[12px] sm:text-sm text-indigo-200/95 break-words">
+                                {ln.tr}
+                              </p>
+                            </>
+                          )}
                         </div>
-                      );
-                    })}
-                  </div>
+                      </div>
+                    );
+                  })}
                 </div>
+
+                {/* Sağ-alt büyüt/küçült butonu */}
+                <button
+                  onClick={() => setLyricsExpanded((v) => !v)}
+                  className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/10 hover:bg-white/15 text-white/90 px-2.5 py-1.5 text-xs sm:text-sm transition"
+                  title={lyricsExpanded ? "Küçült" : "Büyüt"}
+                  aria-label={lyricsExpanded ? "Küçült" : "Büyüt"}
+                >
+                  {lyricsExpanded ? (
+                    <Minimize2 className="h-4 w-4" />
+                  ) : (
+                    <Maximize2 className="h-4 w-4" />
+                  )}
+                  <span className="hidden sm:inline">
+                    {lyricsExpanded ? "Küçült" : "Büyüt"}
+                  </span>
+                </button>
               </div>
             </section>
           )}

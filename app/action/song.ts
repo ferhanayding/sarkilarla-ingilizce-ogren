@@ -7,6 +7,5 @@ export function useSong(slug?: string) {
     fetcher,
     { revalidateOnFocus: false }
   );
-  console.log("useSong çağrıldı:", { slug, data, error, isLoading });
   return { song: data as any | null, error, isLoading, mutate };
 }
