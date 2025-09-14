@@ -7,6 +7,7 @@ import { supabaseServerComponent } from "@/lib/supabase/server";
 import { themeStyle } from "@/ui/theme/config";
 import SwrProvider from "./providers/swr-provider";
 import { Toaster } from "sonner";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -51,6 +52,13 @@ export default async function RootLayout({
         style={themeStyle}
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <head>
+          <script
+            async
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8176951447137413"
+            crossOrigin="anonymous"
+          ></script>
+        </head>
         <AuthProvider initialUserEmail={user?.email}>
           <SwrProvider>
             <Topbar />
