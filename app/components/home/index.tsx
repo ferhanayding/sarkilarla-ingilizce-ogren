@@ -14,6 +14,8 @@ import { CardGridSkeleton, FullScreenLoader } from "../ui/loading";
 import { ListSkeleton } from "../icons/list-skeleton";
 import { GridIcon } from "../icons/grid-icon";
 import { ListIcon } from "../icons/list-icon";
+import AdUnit from "../ad-unit";
+import AdBanner728x90 from "../ad-unit";
 
 type ViewMode = "grid" | "list";
 
@@ -49,6 +51,8 @@ export default function HomeClient() {
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-[rgb(24,35,50)]">
+            <AdBanner728x90   />
+
       <section className="mx-auto max-w-6xl px-4 pt-8 pb-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="sm:flex sm:items-center sm:justify-between text-center sm:text-left self-center sm:self-auto w-full">
