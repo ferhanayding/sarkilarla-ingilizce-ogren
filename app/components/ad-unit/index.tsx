@@ -1,16 +1,17 @@
+// app/components/AdUnit.tsx
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 export default function AdUnit() {
-  const pushedRef = useRef(false);
+  const pushed = useRef(false);
   useEffect(() => {
-    if (pushedRef.current) return;
+    if (pushed.current) return;
     try {
-      // @ts-ignore
       (window.adsbygoogle = window.adsbygoogle || []).push({});
-      pushedRef.current = true;
     } catch {}
+    pushed.current = true;
   }, []);
+
   return (
     <ins
       className="adsbygoogle"

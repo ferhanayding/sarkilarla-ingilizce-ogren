@@ -53,13 +53,18 @@ export default async function RootLayout({
         style={themeStyle}
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <head>
         <Script
+          id="adsbygoogle-init"
+          strategy="afterInteractive"
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8176951447137413"
+          crossOrigin="anonymous"
+        />
+        {/* <Script
           async
           src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${googleAdsClientId}`}
           crossOrigin="anonymous"
-          ></Script>
-          </head>
+          ></Script> */}
 
         <AuthProvider initialUserEmail={user?.email}>
           <SwrProvider>
