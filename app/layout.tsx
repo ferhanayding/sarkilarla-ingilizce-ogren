@@ -46,6 +46,7 @@ export default async function RootLayout({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const googleAdsClientId = process.env.NEXT_PUBLIC_GOOGLE_ADS_CLIENT_ID;
   return (
     <html lang="tr">
       <body
@@ -53,11 +54,11 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <head>
-          <script
+          <Script
             async
-            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8176951447137413"
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${googleAdsClientId}`}
             crossOrigin="anonymous"
-          ></script>
+          ></Script>
         </head>
         <AuthProvider initialUserEmail={user?.email}>
           <SwrProvider>
