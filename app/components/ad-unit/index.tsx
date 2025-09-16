@@ -19,7 +19,6 @@ export default function AdUnit() {
       data-ad-slot="2762441159"
       data-ad-format="auto"
       data-full-width-responsive="true"
-      data-adtest="on"
     />
   );
 }
