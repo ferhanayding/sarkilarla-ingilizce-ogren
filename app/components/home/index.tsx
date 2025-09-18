@@ -38,7 +38,7 @@ export default function HomeClient() {
     };
   }, []);
 
-  const { items, isLoading } = useSongs(q, 30, 0);
+  const { items, isLoading } = useSongs(q, 50, 0);
 
   const data: SongLite[] = useMemo(() => {
     if (items && items.length > 0) return items;
