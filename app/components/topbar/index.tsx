@@ -83,7 +83,7 @@ export default function Topbar() {
                   <LogoLight width={44} height={44} />
                 </Link>
 
-                <div className="flex items-center gap-1 sm:gap-2">
+                <div className="flex items-center gap-2 ">
                   <NavLink href="/" active={pathname === "/"} title="Anasayfa">
                     <HomeIcon />
                     <span className="hidden sm:inline">Anasayfa</span>
@@ -102,24 +102,22 @@ export default function Topbar() {
                     <div className="h-9 w-28 rounded-xl border border-white/15 bg-white/10 animate-pulse" />
                   ) : userEmail ? (
                     <div className="flex items-center gap-2">
-                      <AvatarTooltip email={userEmail} />
+                      {isSm && <AvatarTooltip email={userEmail} />}
                       <button
                         onClick={() => setConfirmOpen(true)}
                         className="inline-flex items-center gap-2 h-9 rounded-xl border border-white/20 px-3 text-sm bg-white/10 hover:bg-white/20 text-white transition cursor-pointer"
                       >
                         <LogOutIcon size={16} className="opacity-95" />
-                        Çıkış yap
                       </button>
                     </div>
                   ) : (
                     <Link
                       href="/auth/login"
                       className="inline-flex items-center gap-2 h-9 rounded-xl px-3 text-sm text-white shadow
-                               bg-[rgb(var(--success))] hover:bg-[rgb(var(--accent))/0.92]
-                               hover:brightness-110 active:scale-[0.98] transition cursor-pointer"
+                               bg-[rgb(var(--success))] hover:bg-[rgb(var(--success)/0.80)]
+                                active:scale-[0.98] transition cursor-pointer"
                     >
                       <LogInIcon size={16} className="opacity-95" />
-                      Giriş yap
                     </Link>
                   )}
                 </div>
