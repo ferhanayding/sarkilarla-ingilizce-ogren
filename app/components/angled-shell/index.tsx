@@ -36,7 +36,7 @@ export default function AngledShell({
   showSkeleton = true,
   skeletonBase = "rgb(var(--brand2))",
   skeletonClassName = "",
-  underFill = "rgb(var(--brand3))",
+  underFill = "transparent",
 }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const [w, setW] = useState(0);

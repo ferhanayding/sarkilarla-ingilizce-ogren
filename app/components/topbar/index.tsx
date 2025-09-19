@@ -42,7 +42,7 @@ export default function Topbar() {
           rise={14}
           tail={115}
           fill={"rgb(var(--brand2))"}
-          underFill={"rgb(var(--brand2)/0.80)"}
+          // underFill={"rgb(var(--brand2)/0.90)"}
         >
           <div className="mx-auto max-w-[1170px] h-[65px] px-4 flex items-center justify-between">
             {isAuth ? (

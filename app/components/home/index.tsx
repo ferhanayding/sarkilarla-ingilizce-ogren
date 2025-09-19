@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { SongLite } from "@/types/songs";
 
@@ -10,12 +10,12 @@ import SongCard from "../song-card";
 import SongListRows from "../song-table";
 import { useIsSmUp } from "@/app/hooks/useIsSmUp";
 import { useSongs } from "@/app/action/songs";
-import { CardGridSkeleton, FullScreenLoader } from "../ui/loading";
+import { CardGridSkeleton } from "../ui/loading";
 import { ListSkeleton } from "../icons/list-skeleton";
-import { GridIcon } from "../icons/grid-icon";
-import { ListIcon } from "../icons/list-icon";
+import Tabs from "./tabs";
 
 type ViewMode = "grid" | "list";
+const PAGE = 15;
 
 export default function HomeClient() {
   const [q, setQ] = useState("");
@@ -36,21 +36,80 @@ export default function HomeClient() {
     };
   }, []);
 
-  const { items, isLoading } = useSongs(q, 50, 0);
+  const [offset, setOffset] = useState(0);
+  const { items, isLoading, hasMore } = useSongs(q, PAGE, offset);
 
-  const data: SongLite[] = useMemo(() => {
-    if (items && items.length > 0) return items;
-    if (!isLoading && q) return [];
-    return items;
-  }, [items, isLoading, q]);
+  const [list, setList] = useState<SongLite[]>([]);
+
+  useEffect(() => {
+    setOffset(0);
+    setList([]);
+  }, [q]);
+
+  const sameBySlug = (a: SongLite[] = [], b: SongLite[] = []) => {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) if (a[i].slug !== b[i].slug) return false;
+    return true;
+  };
+  useEffect(() => {
+    if (!items) return;
+    setList((prev) => {
+      if (offset === 0) {
+        return sameBySlug(prev, items) ? prev : items;
+      }
+      const seen = new Set(prev.map((x) => x.slug));
+      const toAdd = items.filter((it) => !seen.has(it.slug));
+      return toAdd.length ? [...prev, ...toAdd] : prev;
+    });
+  }, [items, offset]);
+
+  const ioRef = useRef<IntersectionObserver | null>(null);
+  const sentinelRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (ioRef.current) {
+        ioRef.current.disconnect();
+        ioRef.current = null;
+      }
+      if (!node) return;
+
+      ioRef.current = new IntersectionObserver(
+        (entries) => {
+          const e = entries[0];
+          if (e.isIntersecting && !isLoading && hasMore) {
+            setOffset((p) => p + PAGE);
+          }
+        },
+        {
+          root: null, 
+          threshold: 0,
+          rootMargin: "600px 0px", 
+        }
+      );
+      ioRef.current.observe(node);
+    },
+    [isLoading, hasMore]
+  );
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (isLoading || !hasMore) return;
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      const viewport = window.innerHeight;
+      const full = document.documentElement.scrollHeight;
+      if (scrollY + viewport + 800 >= full) {
+        setOffset((p) => p + PAGE);
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isLoading, hasMore]);
 
   const showingGrid = view === "grid" && twoCols;
-  const count = isLoading ? 0 : data.length;
-
+  const firstLoad = isLoading && offset === 0;
+  const count = firstLoad ? 0 : list.length;
+console.log(list)
   return (
-    <div className="min-h-screen relative overflow-hidden bg-[rgb(24,35,50)]">
-      {/* <AdBanner728x90   /> */}
-
+    <div className="min-h-screen relative overflow-x-hidden bg-[rgb(24,35,50)]">
       <section className="mx-auto max-w-6xl px-4 pt-8 pb-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="sm:flex sm:items-center sm:justify-between text-center sm:text-left self-center sm:self-auto w-full">
@@ -58,39 +117,7 @@ export default function HomeClient() {
               • İngilizce şarkılar • Türkçe okunuş • Türkçe anlam
             </p>
 
-            {twoCols && (
-              <div className="flex items-center gap-2 self-end">
-                <button
-                  type="button"
-                  onClick={() => setView("grid")}
-                  aria-pressed={view === "grid"}
-                  title="Kart görünümü"
-                  className={[
-                    "inline-flex items-center gap-2 h-9 rounded-xl px-3 text-sm transition cursor-pointer border",
-                    view === "grid"
-                      ? "text-white bg-[rgb(var(--brand2,49_60_75))] border-white/20"
-                      : "text-[rgb(var(--brand,15_28_46))] bg-white/70 hover:bg-white/90 border-[rgb(var(--brand2,49_60_75))/0.18]",
-                  ].join(" ")}
-                >
-                  <GridIcon /> Kart
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setView("list")}
-                  aria-pressed={view === "list"}
-                  title="Liste görünümü"
-                  className={[
-                    "inline-flex items-center gap-2 h-9 rounded-xl px-3 text-sm transition cursor-pointer border",
-                    view === "list"
-                      ? "text-white bg-[rgb(var(--brand2,49_60_75))] border-white/20"
-                      : "text-[rgb(var(--brand,15_28_46))] bg-white/70 hover:bg-white/90 border-[rgb(var(--brand2,49_60_75))/0.18]",
-                  ].join(" ")}
-                >
-                  <ListIcon /> Liste
-                </button>
-              </div>
-            )}
+            {twoCols && <Tabs setView={setView} view={view} />}
           </div>
         </div>
 
@@ -100,22 +127,40 @@ export default function HomeClient() {
       </section>
 
       <main className="mx-auto max-w-6xl px-4 pb-12">
-        {isLoading ? (
+        {firstLoad ? (
           showingGrid ? (
             <CardGridSkeleton />
           ) : (
             <ListSkeleton />
           )
-        ) : data.length === 0 ? (
+        ) : list.length === 0 ? (
           <EmptyState query={q} />
         ) : showingGrid ? (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {data.map((s) => (
-              <SongCard key={s.slug} song={s} />
-            ))}
-          </div>
+          <>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {list.map((s) => (
+                <SongCard key={s.slug} song={s} />
+              ))}
+            </div>
+
+            {/* sentinel */}
+            <div ref={sentinelRef} className="h-10" />
+            {isLoading && hasMore && (
+              <div className="mt-6 flex justify-center">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/30 border-t-white/80" />
+              </div>
+            )}
+          </>
         ) : (
-          <SongListRows songs={data} />
+          <>
+            <SongListRows songs={list} />
+            <div ref={sentinelRef} className="h-10" />
+            {isLoading && hasMore && (
+              <div className="mt-6 flex justify-center">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/30 border-t-white/80" />
+              </div>
+            )}
+          </>
         )}
       </main>
     </div>

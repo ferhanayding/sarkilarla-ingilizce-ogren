@@ -51,7 +51,7 @@ export default async function RootLayout({
     <html lang="tr">
       <body
         style={themeStyle}
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased `}
       >
         {/* <Script
           id="adsbygoogle-init"

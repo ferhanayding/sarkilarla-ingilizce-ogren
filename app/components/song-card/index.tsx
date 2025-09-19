@@ -34,13 +34,13 @@ export default function SongCard({ song }: { song: SongLite }) {
             </h3>
             <div className="relative ">
               {song.hasTimestamps ? (
-                <Tooltip content="Senkron sözler hazır" placement="top">
+                <Tooltip content="Senkron sözler hazır" placement="bottom">
                   <button className="h-8 w-8 grid place-items-center rounded-full bg-white/10 text-success">
                     ✓
                   </button>
                 </Tooltip>
               ) : (
-                <Tooltip content="Senkron söz yok" placement="top">
+                <Tooltip content="Senkron söz yok" placement="bottom">
                   <button className="h-8 w-8 grid place-items-center rounded-full bg-white/10 text-warning">
                     ✗
                   </button>
