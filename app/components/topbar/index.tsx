@@ -13,11 +13,13 @@ import { ConfirmDialog } from "../modals/confirm-modal";
 import { HomeIcon } from "../icons/home-topbar";
 import { InfoIcon } from "../icons/info-icon";
 import AngledShell from "../angled-shell";
+import { useIsSmUp } from "@/app/hooks/useIsSmUp";
 
 export default function Topbar() {
   const pathname = usePathname();
   const isAuth = pathname.startsWith("/auth");
   const { userEmail, checking, signOut } = useAuth();
+  const isSm = useIsSmUp();
 
   const [scrolled, setScrolled] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -39,10 +41,9 @@ export default function Topbar() {
       <div className={wrap}>
         <AngledShell
           height={65}
-          rise={14}
-          tail={115}
+          rise={isSm ? 14 : 0}
+          tail={isSm ? 115 : 0}
           fill={"rgb(var(--brand2))"}
-          // underFill={"rgb(var(--brand2)/0.90)"}
         >
           <div className="mx-auto max-w-[1170px] h-[65px] px-4 flex items-center justify-between">
             {isAuth ? (

@@ -1,5 +1,4 @@
 "use client";
-
 import { useIsSmUp } from "@/app/hooks/useIsSmUp";
 import { SearchIcon } from "../icons/search";
 import { Input } from "../ui/button/input";
@@ -7,11 +6,10 @@ import { Input } from "../ui/button/input";
 type Props = {
   value: string;
   onChange: (v: string) => void;
-  count: number;
 };
 
-export default function SearchBar({ value, onChange, count }: Props) {
-  const isSmUp = useIsSmUp(); 
+export default function SearchBar({ value, onChange }: Props) {
+  const isSmUp = useIsSmUp();
 
   return (
     <div className="relative">
@@ -21,9 +19,10 @@ export default function SearchBar({ value, onChange, count }: Props) {
         placeholder="Şarkı veya sanatçı ara…"
         size={isSmUp ? "lg" : "md"}
         variant="surface"
-        rightIcon={<SearchIcon className="text-white" size={isSmUp ? 30 : 18} />}
+        rightIcon={
+          <SearchIcon className="text-white" size={isSmUp ? 30 : 18} />
+        }
       />
-     
     </div>
   );
 }

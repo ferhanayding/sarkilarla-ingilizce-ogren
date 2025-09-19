@@ -13,6 +13,7 @@ import { useSongs } from "@/app/action/songs";
 import { CardGridSkeleton } from "../ui/loading";
 import { ListSkeleton } from "../icons/list-skeleton";
 import Tabs from "./tabs";
+import { CountUp } from "./sounds-count";
 
 type ViewMode = "grid" | "list";
 const PAGE = 15;
@@ -112,10 +113,9 @@ export default function HomeClient() {
 
   const showingGrid = view === "grid" && twoCols;
   const firstLoad = isLoading && offset === 0;
-  const count = firstLoad ? 0 : list.length;
   return (
     <div className="min-h-screen relative overflow-x-hidden bg-[rgb(24,35,50)]">
-      <section className="mx-auto max-w-6xl px-4 pt-8 pb-4">
+      <section className="mx-auto max-w-6xl px-4 pt-8 sm:pb-4 pb-1">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="sm:flex sm:items-center sm:justify-between text-center sm:text-left self-center sm:self-auto w-full">
             <p className="opacity-70 text-sm sm:text-base text-white/100">
@@ -128,8 +128,8 @@ export default function HomeClient() {
           </div>
         </div>
 
-        <div className="mt-4">
-          <SearchBar value={q} onChange={setQ} count={count} />
+        <div className="mt-4 ">
+          <SearchBar value={q} onChange={setQ} />
         </div>
       </section>
 
@@ -150,7 +150,6 @@ export default function HomeClient() {
               ))}
             </div>
 
-            {/* sentinel */}
             <div ref={sentinelRef} className="h-10" />
             {isLoading && hasMore && (
               <div className="mt-6 flex justify-center">
@@ -160,6 +159,7 @@ export default function HomeClient() {
           </>
         ) : (
           <>
+            {!twoCols && <CountUp value={soundsCount} />}
             <SongListRows songs={list} />
             <div ref={sentinelRef} className="h-10" />
             {isLoading && hasMore && (
