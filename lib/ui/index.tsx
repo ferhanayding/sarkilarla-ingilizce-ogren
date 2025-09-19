@@ -13,3 +13,9 @@ export function formatTime(sec: number) {
   const s = Math.floor(sec % 60);
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
+export function formatNumber(n: number) {
+  if (n >= 1_000_000)
+    return (n / 1_000_000).toFixed(n % 1_000_000 ? 1 : 0) + "M";
+  if (n >= 1_000) return (n / 1_000).toFixed(n % 1_000 ? 1 : 0) + "K";
+  return new Intl.NumberFormat("tr-TR").format(n);
+}

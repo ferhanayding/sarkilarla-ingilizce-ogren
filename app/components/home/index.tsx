@@ -37,7 +37,12 @@ export default function HomeClient() {
   }, []);
 
   const [offset, setOffset] = useState(0);
-  const { items, isLoading, hasMore } = useSongs(q, PAGE, offset);
+  const {
+    items,
+    count: soundsCount,
+    isLoading,
+    hasMore,
+  } = useSongs(q, PAGE, offset);
 
   const [list, setList] = useState<SongLite[]>([]);
 
@@ -48,7 +53,8 @@ export default function HomeClient() {
 
   const sameBySlug = (a: SongLite[] = [], b: SongLite[] = []) => {
     if (a.length !== b.length) return false;
-    for (let i = 0; i < a.length; i++) if (a[i].slug !== b[i].slug) return false;
+    for (let i = 0; i < a.length; i++)
+      if (a[i].slug !== b[i].slug) return false;
     return true;
   };
   useEffect(() => {
@@ -80,9 +86,9 @@ export default function HomeClient() {
           }
         },
         {
-          root: null, 
+          root: null,
           threshold: 0,
-          rootMargin: "600px 0px", 
+          rootMargin: "600px 0px",
         }
       );
       ioRef.current.observe(node);
@@ -107,7 +113,6 @@ export default function HomeClient() {
   const showingGrid = view === "grid" && twoCols;
   const firstLoad = isLoading && offset === 0;
   const count = firstLoad ? 0 : list.length;
-console.log(list)
   return (
     <div className="min-h-screen relative overflow-x-hidden bg-[rgb(24,35,50)]">
       <section className="mx-auto max-w-6xl px-4 pt-8 pb-4">
@@ -117,7 +122,9 @@ console.log(list)
               • İngilizce şarkılar • Türkçe okunuş • Türkçe anlam
             </p>
 
-            {twoCols && <Tabs setView={setView} view={view} />}
+            {twoCols && (
+              <Tabs setView={setView} view={view} count={soundsCount} />
+            )}
           </div>
         </div>
 
