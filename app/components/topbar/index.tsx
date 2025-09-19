@@ -8,11 +8,11 @@ import { LogOutIcon } from "../icons/logout";
 import { LogInIcon } from "../icons/logIn";
 import { LogoLight } from "../icons/logom-light";
 import { NavLink } from "./nav-link";
-import { AvatarTooltip } from "./avatar-tooltip";
+import { AvatarTooltip } from "../tooltip/avatar-tooltip";
 import { ConfirmDialog } from "../modals/confirm-modal";
 import { HomeIcon } from "../icons/home-topbar";
 import { InfoIcon } from "../icons/info-icon";
-import AngledShell from "../angled-rule";
+import AngledShell from "../angled-shell";
 
 export default function Topbar() {
   const pathname = usePathname();
@@ -42,12 +42,12 @@ export default function Topbar() {
           rise={14}
           tail={115}
           fill={"rgb(var(--brand2))"}
-          strokeWidth={1}
+          underFill={"rgb(var(--brand2)/0.80)"}
         >
           <div className="mx-auto max-w-[1170px] h-[65px] px-4 flex items-center justify-between">
             {isAuth ? (
               <>
-                <div className="flex-1 flex justify-start">
+                <div className="flex-1 flex justify-start cursor-pointer">
                   <Link
                     href="/"
                     aria-label="Anasayfa"
@@ -56,7 +56,7 @@ export default function Topbar() {
                     <LogoLight width={44} height={44} />
                   </Link>
                 </div>
-                <div className="w-[140px] shrink-0 flex items-center justify-end gap-1 sm:gap-2">
+                <div className="w-[140px] shrink-0 flex items-center justify-end gap-1 sm:gap-2 cursor-pointer">
                   <NavLink href="/" active={pathname === "/"} title="Anasayfa">
                     <HomeIcon />
                     <span className="hidden sm:inline">Anasayfa</span>
@@ -96,17 +96,6 @@ export default function Topbar() {
                     <InfoIcon />
                     <span className="hidden sm:inline">Hakkımızda</span>
                   </NavLink>
-
-                  {/* {checking && (
-                    <NavLink
-                      href="/favorites"
-                      active={pathname.startsWith("/favorites")}
-                      title="Favorilerim"
-                    >
-                      <HeartIcon />
-                      <span className="hidden sm:inline">Favorilerim</span>
-                    </NavLink>
-                  )} */}
 
                   {checking ? (
                     <div className="h-9 w-28 rounded-xl border border-white/15 bg-white/10 animate-pulse" />
