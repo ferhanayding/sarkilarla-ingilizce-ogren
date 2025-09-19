@@ -107,3 +107,108 @@ body {
     color: rgb(var(--success));
   }
 }
+.angled-rule {
+  /* default değerler */
+  --rule-color: rgba(255, 255, 255, 0.16);
+  --rule-thickness: 1px;
+  --rule-run: 16px; /* 45° için hem düşey hem yatay */
+  --rule-offset: 64px;
+
+  background-repeat: no-repeat;
+}
+
+/* === BOTTOM + RIGHT === */
+.angled-rule.bottom-right {
+  /* 1) uzun alt çizgi (soldan başlayıp diyagonal kutuya kadar) */
+  background-image: linear-gradient(var(--rule-color), var(--rule-color)),
+    /* 2) 45° diagonal (kare) */
+      linear-gradient(
+        45deg,
+        transparent 49%,
+        var(--rule-color) 50%,
+        var(--rule-color) calc(50% + 1px),
+        transparent calc(50% + 1px)
+      ),
+    /* 3) sağda yükselmiş kısa yatay */
+      linear-gradient(var(--rule-color), var(--rule-color));
+
+  /* Boyutlar */
+  background-size: calc(100% - var(--rule-offset) - var(--rule-run))
+      var(--rule-thickness),
+    var(--rule-run) var(--rule-run), var(--rule-offset) var(--rule-thickness);
+
+  /* Konumlar */
+  background-position: left bottom, right var(--rule-offset) bottom,
+    right 0 calc(var(--rule-run));
+}
+
+/* === BOTTOM + LEFT === */
+.angled-rule.bottom-left {
+  background-image: linear-gradient(var(--rule-color), var(--rule-color)),
+    linear-gradient(
+      -45deg,
+      transparent 49%,
+      var(--rule-color) 50%,
+      var(--rule-color) calc(50% + 1px),
+      transparent calc(50% + 1px)
+    ),
+    linear-gradient(var(--rule-color), var(--rule-color));
+
+  background-size: calc(100% - var(--rule-offset) - var(--rule-run))
+      var(--rule-thickness),
+    var(--rule-run) var(--rule-run), var(--rule-offset) var(--rule-thickness);
+
+  background-position: right bottom, left var(--rule-offset) bottom,
+    left 0 calc(var(--rule-run));
+}
+
+/* === TOP + RIGHT === */
+.angled-rule.top-right {
+  background-image: linear-gradient(var(--rule-color), var(--rule-color)),
+    linear-gradient(
+      -45deg,
+      transparent 49%,
+      var(--rule-color) 50%,
+      var(--rule-color) calc(50% + 1px),
+      transparent calc(50% + 1px)
+    ),
+    linear-gradient(var(--rule-color), var(--rule-color));
+
+  background-size: calc(100% - var(--rule-offset) - var(--rule-run))
+      var(--rule-thickness),
+    var(--rule-run) var(--rule-run), var(--rule-offset) var(--rule-thickness);
+
+  background-position: left top, right var(--rule-offset) top,
+    right 0 calc(var(--rule-run) * -1 + var(--rule-thickness));
+}
+
+/* === TOP + LEFT === */
+.angled-rule.top-left {
+  background-image: linear-gradient(var(--rule-color), var(--rule-color)),
+    linear-gradient(
+      45deg,
+      transparent 49%,
+      var(--rule-color) 50%,
+      var(--rule-color) calc(50% + 1px),
+      transparent calc(50% + 1px)
+    ),
+    linear-gradient(var(--rule-color), var(--rule-color));
+
+  background-size: calc(100% - var(--rule-offset) - var(--rule-run))
+      var(--rule-thickness),
+    var(--rule-run) var(--rule-run), var(--rule-offset) var(--rule-thickness);
+
+  background-position: right top, left var(--rule-offset) top,
+    left 0 calc(var(--rule-run) * -1 + var(--rule-thickness));
+}
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+.animate-shimmer {
+  animation: shimmer 1.3s linear infinite;
+}
