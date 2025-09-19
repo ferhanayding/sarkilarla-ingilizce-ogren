@@ -231,22 +231,23 @@ function SongDetail({ song }: { song: SongType }) {
                   ))}
                 </div>
 
-                {/* Sağ-alt büyüt/küçült butonu */}
-                <button
+                <Button
+                  startIcon={
+                    lyricsExpanded ? (
+                      <Minimize2 className="h-4 w-4" />
+                    ) : (
+                      <Maximize2 className="h-4 w-4" />
+                    )
+                  }
                   onClick={() => setLyricsExpanded((v) => !v)}
                   className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/10 hover:bg-white/15 text-white/90 px-2.5 py-1.5 text-xs sm:text-sm transition"
                   title={lyricsExpanded ? "Küçült" : "Büyüt"}
                   aria-label={lyricsExpanded ? "Küçült" : "Büyüt"}
                 >
-                  {lyricsExpanded ? (
-                    <Minimize2 className="h-4 w-4" />
-                  ) : (
-                    <Maximize2 className="h-4 w-4" />
-                  )}
                   <span className="hidden sm:inline">
                     {lyricsExpanded ? "Küçült" : "Büyüt"}
                   </span>
-                </button>
+                </Button>
               </div>
             </section>
           ) : (
@@ -315,22 +316,23 @@ function SongDetail({ song }: { song: SongType }) {
                   })}
                 </div>
 
-                {/* Sağ-alt büyüt/küçült butonu */}
-                <button
+                <Button
+                  startIcon={
+                    lyricsExpanded ? (
+                      <Minimize2 className="h-4 w-4" />
+                    ) : (
+                      <Maximize2 className="h-4 w-4" />
+                    )
+                  }
                   onClick={() => setLyricsExpanded((v) => !v)}
                   className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/10 hover:bg-white/15 text-white/90 px-2.5 py-1.5 text-xs sm:text-sm transition"
                   title={lyricsExpanded ? "Küçült" : "Büyüt"}
                   aria-label={lyricsExpanded ? "Küçült" : "Büyüt"}
                 >
-                  {lyricsExpanded ? (
-                    <Minimize2 className="h-4 w-4" />
-                  ) : (
-                    <Maximize2 className="h-4 w-4" />
-                  )}
                   <span className="hidden sm:inline">
                     {lyricsExpanded ? "Küçült" : "Büyüt"}
                   </span>
-                </button>
+                </Button>
               </div>
             </section>
           )}
