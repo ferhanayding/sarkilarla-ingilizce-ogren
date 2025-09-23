@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import YouTube from "react-youtube";
-import type { YouTubePlayer, YouTubeProps } from "react-youtube";
+import type { YouTubeEvent, YouTubePlayer, YouTubeProps } from "react-youtube";
 import { useSong } from "@/app/action/song";
 import { SongType } from "@/types/songs";
 import { SongDetailSkeleton } from "@/app/components/song-detail/skeleton";
@@ -10,7 +10,9 @@ import { ErrorState } from "@/app/components/song-detail/error";
 import { SegBtn } from "@/app/components/song-detail/seg-button";
 import { formatTime, toSecondsOrNull } from "@/lib/ui";
 import { Button } from "@/app/components/ui/button";
-import { Maximize2, Minimize2 } from "lucide-react";
+import { Clock3, Maximize2, Minimize2, Pause, Play } from "lucide-react";
+import { cx } from "@/lib/ui/cx";
+import { chipTone } from "@/ui/theme/utils";
 
 type Line = { t: string | null; en: string; tr: string; ph: string };
 type ViewMode = "full" | "phOnly" | "phFocus";
@@ -31,13 +33,16 @@ export default function Client({ slug }: { slug: string }) {
   const { song, isLoading, error, mutate } = useSong(slug);
 
   if (isLoading) return <SongDetailSkeleton />;
-  if (error)
-    return (
-      <ErrorState
-        message={String((error as any)?.message || error)}
-        onRetry={() => mutate?.()}
-      />
-    );
+  if (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : typeof error === "string"
+          ? error
+          : "Bir hata oluştu.";
+
+    return <ErrorState message={message} onRetry={() => mutate?.()} />;
+  }
   if (!song) return <ErrorState message="Şarkı bulunamadı." />;
 
   return <SongDetail song={song as SongType} />;
@@ -45,10 +50,12 @@ export default function Client({ slug }: { slug: string }) {
 
 function SongDetail({ song }: { song: SongType }) {
   const playerRef = useRef<YouTubePlayer | null>(null);
+  const activeRowRef = useRef<HTMLDivElement | null>(null);
   const [sec, setSec] = useState(0);
   const [view, setView] = useState<ViewMode>("full");
   const [autoplay, setAutoplay] = useState<boolean>(true);
   const [lyricsExpanded, setLyricsExpanded] = useState(false);
+  const [showTranslations, setShowTranslations] = useState(true);
 
   const timedIdxs = useMemo(() => {
     const arr: { i: number; t: number }[] = [];
@@ -72,6 +79,11 @@ function SongDetail({ song }: { song: SongType }) {
     return { start, end };
   }, [sec, timedIdxs, song.lines.length]);
 
+  const activeLine = useMemo(
+    () => (activeRange.start >= 0 ? song.lines[activeRange.start] : null),
+    [activeRange.start, song.lines]
+  );
+
   useEffect(() => {
     const id = setInterval(async () => {
       try {
@@ -82,7 +94,6 @@ function SongDetail({ song }: { song: SongType }) {
     return () => clearInterval(id);
   }, []);
 
-  const activeRowRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     if (activeRange.start >= 0)
       activeRowRef.current?.scrollIntoView({
@@ -91,38 +102,93 @@ function SongDetail({ song }: { song: SongType }) {
       });
   }, [activeRange.start]);
 
-  const onReady = (e: any) => {
-    playerRef.current = e.target;
+  useEffect(() => {
+    const player = playerRef.current;
+    if (!player) return;
+    try {
+      if (autoplay) player.playVideo?.();
+      else player.pauseVideo?.();
+    } catch (err) {
+      console.error("Video kontrolü başarısız", err);
+    }
+  }, [autoplay]);
 
-    if (autoplay) {
+  const onReady = useCallback(
+    (event: YouTubeEvent<unknown>) => {
+      playerRef.current = event.target;
       try {
-        e.target.playVideo(); // autoplay için elle başlat
+        if (autoplay) {
+          event.target.playVideo();
+        } else {
+          event.target.pauseVideo();
+        }
       } catch (err) {
         console.error("Oynatma hatası", err);
       }
-    } else {
-      try {
-        e.target.pauseVideo();
-      } catch {}
-    }
-  };
+    },
+    [autoplay]
+  );
 
-  const seekTo = (t: string | null) => {
+  const seekTo = useCallback((t: string | null) => {
     const s = toSecondsOrNull(t);
     if (s != null) {
       playerRef.current?.seekTo?.(s, true);
       setSec(s);
     }
-  };
+  }, []);
+
+  const toggleAutoplay = useCallback(() => {
+    setAutoplay((prev) => !prev);
+  }, []);
+
+  const toggleLyricsExpanded = useCallback(() => {
+    setLyricsExpanded((prev) => !prev);
+  }, []);
+
+  const toggleTranslations = useCallback(() => {
+    setShowTranslations((prev) => !prev);
+  }, []);
+
+  const changeView = useCallback((mode: ViewMode) => setView(mode), []);
 
   const showVideo = view !== "phFocus";
+  const isFullView = view === "full";
+  const translationsEnabled = isFullView && showTranslations;
+  const lyricWrapperClass = cx(
+    lyricsExpanded
+      ? null
+      : "h-[66vh] sm:h-[72vh] lg:h-[calc(100dvh-340px)] overflow-auto",
+    "lyricsScroll"
+  );
+  const activeLineTime = activeLine ? toSecondsOrNull(activeLine.t) : null;
+  const activeLineFormatted =
+    activeLineTime != null ? formatTime(activeLineTime) : null;
+
+  const expandButton = (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={toggleLyricsExpanded}
+      startIcon={
+        lyricsExpanded ? (
+          <Minimize2 className="h-4 w-4" />
+        ) : (
+          <Maximize2 className="h-4 w-4" />
+        )
+      }
+      className="min-w-[150px]"
+      title={lyricsExpanded ? "Daha kompakt görünüm" : "Geniş görünüm"}
+    >
+      {lyricsExpanded ? "Daha küçük görünüm" : "Geniş görünüm"}
+    </Button>
+  );
 
   return (
     <main className="min-h-dvh bg-brand3 text-white">
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
         <div className="max-w-6xl mx-auto space-y-6">
           {showVideo && (
-            <section className=" relative w-full mx-auto md:w-3/4 lg:w-1/2 rounded-2xl overflow-hidden border border-white/10 bg-white/[0.04] shadow-[0_10px_40px_rgba(0,0,0,.55)]">
+            <section className="relative w-full mx-auto md:w-3/4 lg:w-1/2 rounded-2xl overflow-hidden border border-white/10 bg-white/[0.04] shadow-[0_10px_40px_rgba(0,0,0,.55)]">
               <div className="relative w-full mx-auto aspect-video">
                 <YouTube
                   videoId={song.youtube_id}
@@ -138,9 +204,8 @@ function SongDetail({ song }: { song: SongType }) {
             </section>
           )}
 
-          <header className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-5 sm:px-7 sm:py-3 shadow-[0_10px_40px_rgba(0,0,0,.45)]">
-            <div className="grid gap-4 lg:grid-cols-[1fr_auto_auto] lg:items-center">
-              {/* Başlık */}
+          <header className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-5 sm:px-7 sm:py-4 shadow-[0_10px_40px_rgba(0,0,0,.45)]">
+            <div className="grid gap-6 lg:grid-cols-[1.2fr_auto_auto] lg:items-start">
               <div className="text-center lg:text-left">
                 <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
                   {song.title}
@@ -148,191 +213,243 @@ function SongDetail({ song }: { song: SongType }) {
                 <p className="mt-1 text-sm sm:text-base text-white/80">
                   {song.artist}
                 </p>
+                {song.tags?.length ? (
+                  <div className="mt-3 flex flex-wrap justify-center lg:justify-start gap-1.5">
+                    {song.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className={cx(
+                          "text-xs font-medium px-2.5 py-1 rounded-full border",
+                          chipTone(tag)
+                        )}
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
               </div>
 
-              {/* Segmented Buttons */}
-              <div className="order-3 lg:order-none sm:justify-self-center">
+              <div className="order-3 lg:order-none flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-center">
                 <div className="inline-flex w-full sm:w-auto rounded-xl border border-white/10 bg-white/5 p-1">
                   <SegBtn
                     active={view === "full"}
-                    onClick={() => setView("full")}
+                    onClick={() => changeView("full")}
                     label="Tümü"
                     className="h-9 px-4 text-sm rounded-lg min-w-[84px]"
                   />
                   <SegBtn
                     active={view === "phOnly"}
-                    onClick={() => setView("phOnly")}
+                    onClick={() => changeView("phOnly")}
                     label="Sadece Ph"
                     className="h-9 px-4 text-sm rounded-lg min-w-[106px]"
                   />
                   <SegBtn
                     active={view === "phFocus"}
-                    onClick={() => setView("phFocus")}
+                    onClick={() => changeView("phFocus")}
                     label="Ph Odak"
                     className="h-9 px-4 text-sm rounded-lg min-w-[96px]"
                   />
                 </div>
+
+                {isFullView ? (
+                  <Button
+                    size="sm"
+                    variant={showTranslations ? "brand2" : "outline"}
+                    onClick={toggleTranslations}
+                    className="rounded-lg"
+                    aria-pressed={showTranslations}
+                  >
+                    Çeviri: {showTranslations ? "Açık" : "Kapalı"}
+                  </Button>
+                ) : null}
               </div>
 
-              {/* Autoplay */}
-              <div className="order-2 lg:order-none">
+              <div className="order-2 lg:order-none flex flex-col items-center gap-2 sm:flex-row sm:justify-end">
                 <Button
-                  onClick={() =>
-                    setAutoplay((a) => {
-                      const nxt = !a;
-                      if (!nxt) {
-                        try {
-                          playerRef.current?.pauseVideo?.();
-                        } catch {}
-                      }
-                      return nxt;
-                    })
-                  }
-                  className={[
-                    "h-9 px-3 text-sm border transition rounded-lg",
-                    "w-full sm:w-auto", // mobilde full width
-                    autoplay
-                      ? "border-emerald-400/50 bg-emerald-500/15"
-                      : "border-white/15 bg-white/5 hover:bg-white/10",
-                  ].join(" ")}
-                  title="Otomatik oynatma"
+                  onClick={toggleAutoplay}
+                  className="w-full sm:w-auto"
+                  variant={autoplay ? "accent" : "outline"}
+                  startIcon={autoplay ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+                  aria-pressed={autoplay}
                 >
-                  Autoplay: {autoplay ? "Açık" : "Kapalı"}
+                  Otomatik oynatma: {autoplay ? "Açık" : "Kapalı"}
                 </Button>
               </div>
             </div>
           </header>
 
-          {view === "phFocus" ? (
-            <section className="max-w-6xl mx-auto">
-              <div className="relative rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-4 sm:p-6 shadow-[0_10px_40px_rgba(0,0,0,.45)]">
-                <div
-                  className={[
-                    // expanded ise sabit yükseklik ve iç scroll YOK
-                    lyricsExpanded
-                      ? ""
-                      : "h-[66vh] sm:h-[72vh] lg:h-[calc(100dvh-340px)] overflow-auto",
-                    "px-1 lyricsScroll",
-                  ].join(" ")}
-                >
-                  {song.lines.map((ln, i) => (
-                    <div
-                      key={i}
-                      ref={i === activeRange.start ? activeRowRef : null}
-                      className={[
-                        "py-2 sm:py-3 text-white/90 text-xl sm:text-2xl leading-relaxed",
-                        i >= activeRange.start && i < activeRange.end
-                          ? "font-extrabold drop-shadow-[0_0_14px_rgba(236,72,153,.25)]"
-                          : "opacity-85",
-                      ].join(" ")}
-                    >
-                      {ln.ph}
-                    </div>
-                  ))}
+          <section className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-5 sm:p-6 shadow-[0_10px_40px_rgba(0,0,0,.45)]" aria-live="polite">
+            {activeLine ? (
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div className="space-y-2">
+                  <span className="text-xs uppercase tracking-widest text-white/60">
+                    Şu an söylenen satır
+                  </span>
+                  <p className="text-lg sm:text-xl font-extrabold text-white drop-shadow-[0_0_16px_rgba(236,72,153,.3)]">
+                    {activeLine.ph}
+                  </p>
+                  <div className="space-y-1 text-[13px] sm:text-sm text-white/85">
+                    {activeLine.en ? (
+                      <p className="italic break-words">{activeLine.en}</p>
+                    ) : null}
+                    {activeLine.tr ? (
+                      <p className="text-indigo-200/95 break-words">{activeLine.tr}</p>
+                    ) : null}
+                  </div>
                 </div>
 
-                <Button
-                  startIcon={
-                    lyricsExpanded ? (
-                      <Minimize2 className="h-4 w-4" />
-                    ) : (
-                      <Maximize2 className="h-4 w-4" />
-                    )
-                  }
-                  onClick={() => setLyricsExpanded((v) => !v)}
-                  className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/10 hover:bg-white/15 text-white/90 px-2.5 py-1.5 text-xs sm:text-sm transition"
-                  title={lyricsExpanded ? "Küçült" : "Büyüt"}
-                  aria-label={lyricsExpanded ? "Küçült" : "Büyüt"}
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!activeLine?.t}
+                    onClick={() => seekTo(activeLine?.t ?? null)}
+                    startIcon={<Clock3 className="h-4 w-4" />}
+                    className="min-w-[150px]"
+                  >
+                    {activeLineFormatted
+                      ? `${activeLineFormatted} satırına git`
+                      : "Zaman bilgisi yok"}
+                  </Button>
+                  {expandButton}
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="space-y-1 text-sm sm:text-base text-white/80">
+                  <p className="font-semibold text-white/90">
+                    Şarkıyı oynatmaya başladığında senkron satırlar vurgulanır.
+                  </p>
+                  <p>
+                    Her satırın yanındaki zaman etiketlerine tıklayarak istediğin bölüme atlayabilirsin.
+                  </p>
+                </div>
+                {expandButton}
+              </div>
+            )}
+          </section>
+
+          {view === "phFocus" ? (
+            <section className="max-w-6xl mx-auto">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-4 sm:p-6 shadow-[0_10px_40px_rgba(0,0,0,.45)]">
+                <div className={cx(lyricWrapperClass, "px-1 space-y-2 sm:space-y-3")}
                 >
-                  <span className="hidden sm:inline">
-                    {lyricsExpanded ? "Küçült" : "Büyüt"}
-                  </span>
-                </Button>
+                  {song.lines.map((ln, i) => {
+                    const isActive =
+                      activeRange.start >= 0 &&
+                      i >= activeRange.start &&
+                      i < activeRange.end;
+                    return (
+                      <div
+                        key={i}
+                        ref={i === activeRange.start ? activeRowRef : null}
+                        className={cx(
+                          "py-2 sm:py-3 text-white/90 text-xl sm:text-2xl leading-relaxed transition", 
+                          isActive
+                            ? "font-extrabold drop-shadow-[0_0_18px_rgba(236,72,153,.35)]"
+                            : "opacity-85"
+                        )}
+                      >
+                        {ln.ph}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </section>
           ) : (
             <section>
-              <div className="relative rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-2 sm:p-3 shadow-[0_10px_40px_rgba(0,0,0,.45)]">
-                <div
-                  className={[
-                    lyricsExpanded
-                      ? "" // expanded: sabit yükseklik yok, iç scroll yok
-                      : "h-[66vh] sm:h-[72vh] lg:h-[calc(100dvh-340px)] overflow-auto",
-                    "lyricsScroll",
-                  ].join(" ")}
+              <div className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-2 sm:p-3 shadow-[0_10px_40px_rgba(0,0,0,.45)]">
+                <div className={cx(lyricWrapperClass, "space-y-2")}
                 >
                   {song.lines.map((ln: Line, i: number) => {
-                    const isInActive =
+                    const isActive =
                       activeRange.start >= 0 &&
                       i >= activeRange.start &&
                       i < activeRange.end;
+                    const timestamp = toSecondsOrNull(ln.t);
+                    const activePhClass = view === "phOnly"
+                      ? "text-fuchsia-300 font-extrabold text-lg sm:text-xl lg:text-2xl drop-shadow-[0_0_20px_rgba(255,0,180,.25)]"
+                      : "text-fuchsia-300 font-extrabold text-base sm:text-lg lg:text-2xl drop-shadow-[0_0_20px_rgba(255,0,180,.25)]";
+                    const inactivePhClass = view === "phOnly"
+                      ? "text-fuchsia-200/90 font-semibold text-base sm:text-lg lg:text-xl"
+                      : "text-fuchsia-200/85 font-bold text-sm sm:text-base lg:text-xl";
 
                     return (
                       <div
                         key={i}
                         ref={i === activeRange.start ? activeRowRef : null}
-                        className={[
-                          "grid grid-cols-[1fr_auto] items-start gap-x-3 rounded-xl px-3 sm:px-4 py-3 sm:py-3.5 transition",
-                          isInActive
+                        className={cx(
+                          "rounded-xl px-3 sm:px-4 py-3 sm:py-3.5 transition",
+                          isActive
                             ? "bg-white/[0.06] shadow-[0_0_0_1px_rgba(255,255,255,.12)]"
-                            : "hover:bg-white/[0.04]",
-                        ].join(" ")}
+                            : "hover:bg-white/[0.04]"
+                        )}
                       >
-                        <div className="min-w-0">
-                          <div className="flex items-start gap-2">
+                        <div className="flex items-start gap-3 sm:gap-4">
+                          <div className="flex flex-col items-center gap-2 pt-1">
                             <span
-                              className={[
-                                "mt-1 block h-4 w-1 rounded-full",
-                                isInActive
+                              className={cx(
+                                "block h-4 w-1 rounded-full",
+                                isActive
                                   ? "bg-fuchsia-400/80"
-                                  : "bg-white/10",
-                              ].join(" ")}
+                                  : "bg-white/10"
+                              )}
                             />
+                            <button
+                              type="button"
+                              onClick={() => seekTo(ln.t)}
+                              disabled={timestamp == null}
+                              className={cx(
+                                "flex items-center gap-1 rounded-lg border px-2 py-1 text-[11px] sm:text-xs font-medium transition",
+                                "border-white/20 bg-white/10 text-white/80 hover:bg-white/15",
+                                isActive &&
+                                  "border-fuchsia-400/70 text-fuchsia-100 shadow-[0_0_18px_rgba(236,72,153,.25)]",
+                                timestamp == null &&
+                                  "opacity-55 cursor-not-allowed hover:bg-white/10"
+                              )}
+                              title={
+                                timestamp != null
+                                  ? "Bu satıra git"
+                                  : "Zaman etiketi yok"
+                              }
+                            >
+                              <Clock3 className="h-3.5 w-3.5" />
+                              <span>{timestamp != null ? formatTime(timestamp) : "--:--"}</span>
+                            </button>
+                          </div>
+
+                          <div className="min-w-0 flex-1">
                             <p
-                              className={[
-                                "tracking-wide break-words",
-                                isInActive
-                                  ? "text-fuchsia-400 font-extrabold text-base sm:text-lg lg:text-2xl drop-shadow-[0_0_20px_rgba(255,0,180,.25)]"
-                                  : "text-fuchsia-200/85 font-bold text-sm sm:text-base lg:text-xl",
-                              ].join(" ")}
+                              className={cx(
+                                "tracking-wide break-words transition-colors",
+                                isActive ? activePhClass : inactivePhClass
+                              )}
                             >
                               {ln.ph}
                             </p>
-                          </div>
 
-                          {view === "full" && (
-                            <>
-                              <p className="mt-1 text-[12px] sm:text-sm italic text-white/85 break-words">
-                                {ln.en}
-                              </p>
-                              <p className="text-[12px] sm:text-sm text-indigo-200/95 break-words">
-                                {ln.tr}
-                              </p>
-                            </>
-                          )}
+                            {translationsEnabled ? (
+                              <div className="mt-1 space-y-0.5 text-[12px] sm:text-sm">
+                                {ln.en ? (
+                                  <p className="italic text-white/85 break-words">
+                                    {ln.en}
+                                  </p>
+                                ) : null}
+                                {ln.tr ? (
+                                  <p className="text-indigo-200/95 break-words">
+                                    {ln.tr}
+                                  </p>
+                                ) : null}
+                              </div>
+                            ) : null}
+                          </div>
                         </div>
                       </div>
                     );
                   })}
                 </div>
-
-                <Button
-                  startIcon={
-                    lyricsExpanded ? (
-                      <Minimize2 className="h-4 w-4" />
-                    ) : (
-                      <Maximize2 className="h-4 w-4" />
-                    )
-                  }
-                  onClick={() => setLyricsExpanded((v) => !v)}
-                  className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/10 hover:bg-white/15 text-white/90 px-2.5 py-1.5 text-xs sm:text-sm transition"
-                  title={lyricsExpanded ? "Küçült" : "Büyüt"}
-                  aria-label={lyricsExpanded ? "Küçült" : "Büyüt"}
-                >
-                  <span className="hidden sm:inline">
-                    {lyricsExpanded ? "Küçült" : "Büyüt"}
-                  </span>
-                </Button>
               </div>
             </section>
           )}
