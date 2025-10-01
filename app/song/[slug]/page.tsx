@@ -36,9 +36,7 @@ export async function generateMetadata({
   }
 }
 
-export default async function Page(
-  { params }: { params: Promise<Params> } // Next 14 kullanıyorsan: { params }: { params: Params }
-) {
+export default async function Page({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
   return <Client slug={slug} />;
 }

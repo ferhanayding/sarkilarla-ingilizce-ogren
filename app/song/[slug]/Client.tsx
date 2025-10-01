@@ -8,7 +8,7 @@ import { SongType } from "@/types/songs";
 import { SongDetailSkeleton } from "@/app/components/song-detail/skeleton";
 import { ErrorState } from "@/app/components/song-detail/error";
 import { SegBtn } from "@/app/components/song-detail/seg-button";
-import { formatTime, toSecondsOrNull } from "@/lib/ui";
+import { toSecondsOrNull } from "@/lib/ui";
 import { Button } from "@/app/components/ui/button";
 import { Maximize2, Minimize2 } from "lucide-react";
 
@@ -47,12 +47,24 @@ function SongDetail({ song }: { song: SongType }) {
   const playerRef = useRef<YouTubePlayer | null>(null);
   const [sec, setSec] = useState(0);
   const [view, setView] = useState<ViewMode>("full");
-  const [autoplay, setAutoplay] = useState<boolean>(true);
   const [lyricsExpanded, setLyricsExpanded] = useState(false);
+
+  const totalSeconds = useMemo(() => {
+    let last = 0;
+    for (const ln of song.lines as Line[]) {
+      const s = toSecondsOrNull(ln.t);
+      if (s != null) last = Math.max(last, s);
+    }
+    return last;
+  }, [song.lines]);
+
+  const mm = String(Math.floor(totalSeconds / 60)).padStart(1, "0");
+  const ss = String(totalSeconds % 60).padStart(2, "0");
+  const durationTxt = `${mm}:${ss}`;
 
   const timedIdxs = useMemo(() => {
     const arr: { i: number; t: number }[] = [];
-    song.lines.forEach((ln: Line, i) => {
+    (song.lines as Line[]).forEach((ln, i) => {
       const ts = toSecondsOrNull(ln.t);
       if (ts != null) arr.push({ i, t: ts });
     });
@@ -93,43 +105,26 @@ function SongDetail({ song }: { song: SongType }) {
 
   const onReady = (e: any) => {
     playerRef.current = e.target;
-
-    if (autoplay) {
-      try {
-        e.target.playVideo(); // autoplay için elle başlat
-      } catch (err) {
-        console.error("Oynatma hatası", err);
-      }
-    } else {
-      try {
-        e.target.pauseVideo();
-      } catch {}
-    }
-  };
-
-  const seekTo = (t: string | null) => {
-    const s = toSecondsOrNull(t);
-    if (s != null) {
-      playerRef.current?.seekTo?.(s, true);
-      setSec(s);
-    }
   };
 
   const showVideo = view !== "phFocus";
+
+  const Chip = ({ children }: { children: React.ReactNode }) => (
+    <span className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-xs text-white/85">
+      {children}
+    </span>
+  );
 
   return (
     <main className="min-h-dvh bg-brand3 text-white">
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
         <div className="max-w-6xl mx-auto space-y-6">
           {showVideo && (
-            <section className=" relative w-full mx-auto md:w-3/4 lg:w-1/2 rounded-2xl overflow-hidden border border-white/10 bg-white/[0.04] shadow-[0_10px_40px_rgba(0,0,0,.55)]">
+            <section className="relative w-full mx-auto md:w-3/4 lg:w-1/2 rounded-2xl overflow-hidden border border-white/10 bg-white/[0.04] shadow-[0_10px_40px_rgba(0,0,0,.55)]">
               <div className="relative w-full mx-auto aspect-video">
                 <YouTube
                   videoId={song.youtube_id}
-                  opts={{
-                    ...YT_OPTS,
-                    playerVars: { ...YT_OPTS.playerVars, autoplay },
-                  }}
+                  opts={YT_OPTS}
                   onReady={onReady}
                   className="absolute inset-0"
                   iframeClassName="w-full h-full"
@@ -138,9 +133,8 @@ function SongDetail({ song }: { song: SongType }) {
             </section>
           )}
 
-          <header className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-5 sm:px-7 sm:py-3 shadow-[0_10px_40px_rgba(0,0,0,.45)]">
-            <div className="grid gap-4 lg:grid-cols-[1fr_auto_auto] lg:items-center">
-              {/* Başlık */}
+          <header className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-5 sm:px-7 sm:py-4 shadow-[0_10px_40px_rgba(0,0,0,.45)]">
+            <div className="grid gap-4 lg:grid-cols-[1fr_auto_1fr] lg:items-center">
               <div className="text-center lg:text-left">
                 <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
                   {song.title}
@@ -150,55 +144,40 @@ function SongDetail({ song }: { song: SongType }) {
                 </p>
               </div>
 
-              {/* Segmented Buttons */}
-              <div className="order-3 lg:order-none sm:justify-self-center">
+              <div className="justify-self-center">
                 <div className="inline-flex w-full sm:w-auto rounded-xl border border-white/10 bg-white/5 p-1">
                   <SegBtn
                     active={view === "full"}
                     onClick={() => setView("full")}
-                    label="Tümü"
-                    className="h-9 px-4 text-sm rounded-lg min-w-[84px]"
+                    label="Full"
+                    className="h-9 px-4 text-sm rounded-lg min-w-[80px]"
                   />
                   <SegBtn
                     active={view === "phOnly"}
                     onClick={() => setView("phOnly")}
-                    label="Sadece Ph"
-                    className="h-9 px-4 text-sm rounded-lg min-w-[106px]"
+                    label="Ph only"
+                    className="h-9 px-4 text-sm rounded-lg min-w-[94px]"
                   />
                   <SegBtn
                     active={view === "phFocus"}
                     onClick={() => setView("phFocus")}
-                    label="Ph Odak"
-                    className="h-9 px-4 text-sm rounded-lg min-w-[96px]"
+                    label="Ph focus"
+                    className="h-9 px-4 text-sm rounded-lg min-w-[94px]"
                   />
                 </div>
               </div>
 
-              {/* Autoplay */}
-              <div className="order-2 lg:order-none">
-                <Button
-                  onClick={() =>
-                    setAutoplay((a) => {
-                      const nxt = !a;
-                      if (!nxt) {
-                        try {
-                          playerRef.current?.pauseVideo?.();
-                        } catch {}
-                      }
-                      return nxt;
-                    })
-                  }
-                  className={[
-                    "h-9 px-3 text-sm border transition rounded-lg",
-                    "w-full sm:w-auto", // mobilde full width
-                    autoplay
-                      ? "border-emerald-400/50 bg-emerald-500/15"
-                      : "border-white/15 bg-white/5 hover:bg-white/10",
-                  ].join(" ")}
-                  title="Otomatik oynatma"
-                >
-                  Autoplay: {autoplay ? "Açık" : "Kapalı"}
-                </Button>
+              <div className="justify-self-center lg:justify-self-end">
+                <div className="flex flex-wrap items-center gap-2">
+                  {(song.tags ?? []).map((t) => (
+                    <Chip key={t}>#{t}</Chip>
+                  ))}
+                  {Array.isArray(song.tags) &&
+                    song.tags.find((t) => /^\d{4}$/.test(t)) && (
+                      <Chip>{song.tags.find((t) => /^\d{4}$/.test(t))}</Chip>
+                    )}
+                  <Chip>⏱ {durationTxt}</Chip>
+                </div>
               </div>
             </div>
           </header>
@@ -208,21 +187,20 @@ function SongDetail({ song }: { song: SongType }) {
               <div className="relative rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-4 sm:p-6 shadow-[0_10px_40px_rgba(0,0,0,.45)]">
                 <div
                   className={[
-                    // expanded ise sabit yükseklik ve iç scroll YOK
                     lyricsExpanded
                       ? ""
                       : "h-[66vh] sm:h-[72vh] lg:h-[calc(100dvh-340px)] overflow-auto",
                     "px-1 lyricsScroll",
                   ].join(" ")}
                 >
-                  {song.lines.map((ln, i) => (
+                  {(song.lines as Line[]).map((ln, i) => (
                     <div
                       key={i}
                       ref={i === activeRange.start ? activeRowRef : null}
                       className={[
-                        "py-2 sm:py-3 text-white/90 text-xl sm:text-2xl leading-relaxed",
+                        "py-2 sm:py-3 text-white/95 text-xl sm:text-2xl leading-relaxed",
                         i >= activeRange.start && i < activeRange.end
-                          ? "font-extrabold drop-shadow-[0_0_14px_rgba(236,72,153,.25)]"
+                          ? "font-extrabold drop-shadow-[0_0_14px_rgba(255,255,255,.25)]"
                           : "opacity-85",
                       ].join(" ")}
                     >
@@ -256,12 +234,12 @@ function SongDetail({ song }: { song: SongType }) {
                 <div
                   className={[
                     lyricsExpanded
-                      ? "" // expanded: sabit yükseklik yok, iç scroll yok
+                      ? ""
                       : "h-[66vh] sm:h-[72vh] lg:h-[calc(100dvh-340px)] overflow-auto",
                     "lyricsScroll",
                   ].join(" ")}
                 >
-                  {song.lines.map((ln: Line, i: number) => {
+                  {(song.lines as Line[]).map((ln, i) => {
                     const isInActive =
                       activeRange.start >= 0 &&
                       i >= activeRange.start &&
@@ -274,8 +252,8 @@ function SongDetail({ song }: { song: SongType }) {
                         className={[
                           "grid grid-cols-[1fr_auto] items-start gap-x-3 rounded-xl px-3 sm:px-4 py-3 sm:py-3.5 transition",
                           isInActive
-                            ? "bg-white/[0.06] shadow-[0_0_0_1px_rgba(255,255,255,.12)]"
-                            : "hover:bg-white/[0.04]",
+                            ? "bg-white/[0.08] shadow-[0_0_0_1px_rgba(255,255,255,.12)]"
+                            : "hover:bg-white/[0.05]",
                         ].join(" ")}
                       >
                         <div className="min-w-0">
@@ -283,17 +261,15 @@ function SongDetail({ song }: { song: SongType }) {
                             <span
                               className={[
                                 "mt-1 block h-4 w-1 rounded-full",
-                                isInActive
-                                  ? "bg-fuchsia-400/80"
-                                  : "bg-white/10",
+                                isInActive ? "bg-white" : "bg-white/20",
                               ].join(" ")}
                             />
                             <p
                               className={[
                                 "tracking-wide break-words",
                                 isInActive
-                                  ? "text-fuchsia-400 font-extrabold text-base sm:text-lg lg:text-2xl drop-shadow-[0_0_20px_rgba(255,0,180,.25)]"
-                                  : "text-fuchsia-200/85 font-bold text-sm sm:text-base lg:text-xl",
+                                  ? "text-white font-extrabold text-base sm:text-lg lg:text-2xl drop-shadow-[0_0_20px_rgba(255,255,255,.25)]"
+                                  : "text-white/85 font-bold text-sm sm:text-base lg:text-xl",
                               ].join(" ")}
                             >
                               {ln.ph}
@@ -305,7 +281,7 @@ function SongDetail({ song }: { song: SongType }) {
                               <p className="mt-1 text-[12px] sm:text-sm italic text-white/85 break-words">
                                 {ln.en}
                               </p>
-                              <p className="text-[12px] sm:text-sm text-indigo-200/95 break-words">
+                              <p className="text-[12px] sm:text-sm text-white/85/95 break-words">
                                 {ln.tr}
                               </p>
                             </>
@@ -342,7 +318,7 @@ function SongDetail({ song }: { song: SongType }) {
       <style jsx>{`
         .lyricsScroll {
           scrollbar-width: thin;
-          scrollbar-color: rgba(148, 163, 184, 0.55) transparent;
+          scrollbar-color: rgba(255, 255, 255, 0.55) transparent;
         }
         .lyricsScroll::-webkit-scrollbar {
           width: 8px;
@@ -351,11 +327,11 @@ function SongDetail({ song }: { song: SongType }) {
           background: transparent;
         }
         .lyricsScroll::-webkit-scrollbar-thumb {
-          background: rgba(148, 163, 184, 0.55);
+          background: rgba(255, 255, 255, 0.55);
           border-radius: 9999px;
         }
         .lyricsScroll::-webkit-scrollbar-thumb:hover {
-          background: rgba(148, 163, 184, 0.85);
+          background: rgba(255, 255, 255, 0.85);
         }
       `}</style>
     </main>
