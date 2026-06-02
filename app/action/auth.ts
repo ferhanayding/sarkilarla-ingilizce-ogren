@@ -7,7 +7,7 @@ export async function signInWithPasswordAction(values: { email: string; password
   const supabase = await supabaseServerAction();
   const { error } = await supabase.auth.signInWithPassword(values);
   if (error) return { error: error.message };
-  redirect("/"); 
+  redirect("/");
 }
 
 export async function signOutAction() {

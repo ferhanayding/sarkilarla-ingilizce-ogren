@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+// @ts-ignore: CSS module declarations may not be available in this environment
 import "./globals.css";
 import Topbar from "./components/topbar";
 import AuthProvider from "./context/auth/auth-provider";
@@ -7,7 +8,6 @@ import { supabaseServerComponent } from "@/lib/supabase/server";
 import { themeStyle } from "@/ui/theme/config";
 import SwrProvider from "./providers/swr-provider";
 import { Toaster } from "sonner";
-import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

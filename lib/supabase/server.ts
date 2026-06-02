@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 
-const SUPABASE_URL  = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON!;
 
 // (Server Component / Server Action için) — sende zaten var, dokunmadım
@@ -21,8 +21,8 @@ export async function supabaseServerComponent() {
       get(name: string) {
         return cookieStore.get(name)?.value;
       },
-      set(_name: string, _value: string, _opts?: CookieOptions) {},
-      remove(_name: string, _opts?: CookieOptions) {},
+      set(_name: string, _value: string, _opts?: CookieOptions) { },
+      remove(_name: string, _opts?: CookieOptions) { },
     },
   });
 }

@@ -10,7 +10,8 @@ export async function GET(req: Request) {
   const offset = Math.max(Number(searchParams.get("offset") || 0), 0);
 
   const supabase = await supabaseServerComponent();
-
+  console.log("URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
+  console.log("ANON:", process.env.NEXT_PUBLIC_SUPABASE_ANON);
   let query = supabase
     .from("songs")
     .select("id,slug,title,artist,youtube_id,tags,created_at,lines", {
@@ -27,7 +28,16 @@ export async function GET(req: Request) {
 
   const { data, count, error } = await query;
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("SUPABASE ERROR:", error);
+    return NextResponse.json(
+      {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code,
+      },
+      { status: 500 }
+    );
   }
 
   const items =
